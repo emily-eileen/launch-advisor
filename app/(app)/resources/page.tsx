@@ -25,9 +25,12 @@ const CATEGORY_META: Record<string, { color: string; label: string }> = {
   "Productivity":     { color: "#0EA5E9", label: "Productivity" },
   "HR & Payroll":     { color: "#8B5CF6", label: "HR & Payroll" },
   "E-commerce":       { color: "#F97316", label: "E-commerce" },
+  "CRM & Sales":      { color: "#16A34A", label: "CRM & Sales" },
+  "Automation":       { color: "#1A2B4A", label: "Automation" },
+  "Newsletter":       { color: "#F59E0B", label: "Newsletter" },
 };
 
-const categories = ["All", ...Object.keys(CATEGORY_META)];
+const categories = ["All", "Entity Formation", "Banking", "Accounting", "Branding", "Website", "CRM & Sales", "Marketing", "Newsletter", "Automation", "Insurance", "Legal", "HR & Payroll", "E-commerce", "Productivity"];
 
 const resources: Resource[] = [
   // Entity Formation
@@ -84,6 +87,19 @@ const resources: Resource[] = [
   // HR & Payroll
   { id: "r34", name: "Gusto",                               category: "HR & Payroll",     color: "#8B5CF6", description: "Full-service payroll and HR for small businesses. Simple and reliable.", url: "https://gusto.com",                  affiliateUrl: "https://gusto.com" },
   { id: "r35", name: "Rippling",                             category: "HR & Payroll",     color: "#8B5CF6", description: "Unified HR, IT, and finance platform for growing teams.",              url: "https://www.rippling.com",              affiliateUrl: "https://www.rippling.com" },
+
+  // CRM & Sales
+  { id: "r38", name: "HubSpot",    category: "CRM & Sales", color: "#16A34A", description: "Free CRM with email, pipeline, and contact tracking. Scales with your business.", url: "https://www.hubspot.com", affiliateUrl: "https://www.hubspot.com" },
+  { id: "r39", name: "Pipedrive",  category: "CRM & Sales", color: "#16A34A", description: "Sales-focused CRM with visual pipeline. Great for service businesses.", url: "https://www.pipedrive.com", affiliateUrl: "https://www.pipedrive.com" },
+  { id: "r40", name: "Close",      category: "CRM & Sales", color: "#16A34A", description: "Built-in calling, SMS, and email CRM designed for small sales teams.", url: "https://close.com", affiliateUrl: "https://close.com" },
+
+  // Newsletter
+  { id: "r41", name: "Beehiiv",    category: "Newsletter",   color: "#F59E0B", description: "Newsletter platform built for growth. 60% recurring commissions.", url: "https://www.beehiiv.com", affiliateUrl: "https://www.beehiiv.com" },
+  { id: "r42", name: "Substack",   category: "Newsletter",   color: "#F59E0B", description: "Free newsletter platform with built-in paid subscriptions.",           url: "https://substack.com", affiliateUrl: "" },
+
+  // Automation
+  { id: "r43", name: "Zapier",     category: "Automation",   color: "#1A2B4A", description: "Connect 6000+ apps without code. Automate repetitive tasks instantly.", url: "https://zapier.com", affiliateUrl: "https://zapier.com" },
+  { id: "r44", name: "Make",       category: "Automation",   color: "#1A2B4A", description: "Visual automation builder. More powerful than Zapier for complex flows.", url: "https://www.make.com", affiliateUrl: "https://www.make.com" },
 
   // E-commerce
   { id: "r36", name: "Shopify",                              category: "E-commerce",       color: "#F97316", description: "The leading e-commerce platform. Easy to set up, powerful at scale.", url: "https://www.shopify.com",               affiliateUrl: "https://www.shopify.com" },
