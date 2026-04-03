@@ -1,23 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  Circle,
-  ExternalLink,
-  BookOpen,
-  Star,
-  Loader2,
+  ArrowLeft, ArrowRight, CheckCircle2, ExternalLink,
+  BookOpen, Loader2, Zap,
 } from "lucide-react";
 import { getStepById, getAdjacentSteps } from "@/lib/data/checklist";
 
+const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B"];
+
 export default function StepDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const stepId = params.stepId as string;
   const step = getStepById(stepId);
   const { prev, next } = getAdjacentSteps(stepId);
@@ -29,146 +24,180 @@ export default function StepDetailPage() {
 
   if (!step) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-muted mb-4">Step not found.</p>
-        <Link href="/checklist" className="text-orange font-medium hover:underline">
+      <div style={{ textAlign: "center", padding: "80px 20px" }}>
+        <p style={{ fontFamily: "var(--font-heading)", color: "var(--ink-muted)", marginBottom: 16 }}>
+          Step not found.
+        </p>
+        <Link href="/checklist" className="btn btn-primary" style={{ fontSize: "0.75rem" }}>
           Back to checklist
         </Link>
       </div>
     );
   }
 
+  const color = PHASE_COLORS[step.phase - 1];
+
   async function handleToggleDone() {
     setIsDone(!isDone);
-    // In production, save to Supabase user_checklist_progress
-    console.log(`Step ${stepId} marked as ${!isDone ? "done" : "not done"}`);
   }
 
   async function handleSaveJournal() {
     if (!journalEntry.trim()) return;
     setSaving(true);
-    // In production, save to Supabase journal_entries
-    console.log("Journal entry saved:", { stepId, text: journalEntry });
     await new Promise((r) => setTimeout(r, 500));
     setSaving(false);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setTimeout(() => setSaved(false), 2500);
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Back link */}
-      <Link
-        href="/checklist"
-        className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to checklist
+    <div style={{ maxWidth: 680, display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* ── Back link ─────────────────────────────────────── */}
+      <Link href="/checklist" style={{
+        display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
+        fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 600,
+        letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--ink-muted)",
+      }}>
+        <ArrowLeft style={{ width: 13, height: 13 }} />
+        All phases
       </Link>
 
-      {/* Phase badge */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-orange bg-orange-light px-2.5 py-1 rounded-full">
+      {/* ── Phase badge + step info ───────────────────────── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <span style={{
+          fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.18em",
+          textTransform: "uppercase", padding: "3px 10px", border: `2px solid ${color}`, color,
+        }}>
           Phase {step.phase}: {step.phaseName}
         </span>
-        <span className="text-xs text-muted">
+        <span style={{
+          fontFamily: "var(--font-heading)", fontSize: "0.68rem", fontWeight: 600,
+          color: "var(--ink-muted)",
+        }}>
           Step {step.order} of 5
         </span>
       </div>
 
-      {/* Title + completion toggle */}
-      <div className="bg-white rounded-2xl border border-border-light p-6">
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-xl font-bold font-[family-name:var(--font-space-grotesk)] text-navy">
-            {step.title}
+      {/* ── Main card ─────────────────────────────────────── */}
+      <div className="panel" style={{ borderLeft: `4px solid ${color}`, padding: 28, boxShadow: `4px 4px 0 ${color}` }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 16 }}>
+          <h1 style={{
+            fontFamily: "var(--font-display)", fontSize: "1.9rem", letterSpacing: "0.03em",
+            color: "var(--navy)", lineHeight: 1.1,
+          }}>
+            {step.title.toUpperCase()}
           </h1>
           <button
             onClick={handleToggleDone}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all flex-shrink-0 ${
-              isDone
-                ? "bg-success-light text-success border border-success/20"
-                : "bg-surface text-muted hover:bg-orange-light hover:text-orange border border-border-light"
-            }`}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 6, flexShrink: 0,
+              fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 700,
+              letterSpacing: "0.08em", textTransform: "uppercase",
+              padding: "8px 14px", border: `2px solid ${isDone ? color : "var(--border)"}`,
+              background: isDone ? color : "transparent", color: isDone ? "white" : "var(--ink-mid)",
+              cursor: "pointer", transition: "all 0.15s",
+            }}
           >
-            {isDone ? (
-              <>
-                <CheckCircle2 className="w-4 h-4" /> Done
-              </>
-            ) : (
-              <>
-                <Circle className="w-4 h-4" /> Mark as Done
-              </>
-            )}
+            <CheckCircle2 style={{ width: 13, height: 13 }} />
+            {isDone ? "Done!" : "Mark done"}
           </button>
         </div>
 
-        <p className="text-muted mt-3 leading-relaxed">{step.description}</p>
+        <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-mid)", lineHeight: 1.65, marginBottom: 20 }}>
+          {step.description}
+        </p>
 
-        {/* Action */}
-        <div className="mt-5 bg-orange-light/50 rounded-xl p-4 border border-orange/10">
-          <p className="text-xs font-medium text-orange uppercase tracking-wide mb-1">
-            Do this next
+        {/* Action box */}
+        <div style={{
+          background: "rgba(249,115,22,0.06)", border: "2px solid rgba(249,115,22,0.2)",
+          padding: "14px 16px",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+            <Zap style={{ width: 12, height: 12, color: "var(--orange)" }} />
+            <span style={{
+              fontFamily: "var(--font-display)", fontSize: "0.6rem", letterSpacing: "0.2em",
+              textTransform: "uppercase", color: "var(--orange)",
+            }}>
+              Do this now
+            </span>
+          </div>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "0.88rem", color: "var(--ink)", lineHeight: 1.5 }}>
+            {step.action}
           </p>
-          <p className="text-sm text-foreground">{step.action}</p>
         </div>
       </div>
 
-      {/* Resources */}
+      {/* ── Resources ─────────────────────────────────────── */}
       {step.resources.length > 0 && (
         <div>
-          <h2 className="text-base font-semibold font-[family-name:var(--font-space-grotesk)] text-navy mb-3">
-            Recommended Tools & Resources
-          </h2>
-          <div className="space-y-2">
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+            <div style={{ height: 1, width: 24, background: "var(--orange)" }} />
+            <span style={{
+              fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em",
+              textTransform: "uppercase", color: "var(--ink-muted)",
+            }}>
+              Tools & Resources
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {step.resources.map((resource, idx) => (
               <a
                 key={idx}
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => {
-                  // Track click event (console for now, Supabase later)
-                  console.log("Resource click:", {
-                    resource: resource.name,
-                    url: resource.url,
-                    affiliate: resource.affiliate || false,
-                    step: stepId,
-                  });
-                }}
-                className="flex items-center gap-4 bg-white rounded-xl border border-border-light p-4 hover:border-orange/30 hover:shadow-sm transition-all group"
+                className="resource-card"
+                style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 14 }}
               >
-                <div className="w-10 h-10 bg-surface rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-orange-light transition-colors">
-                  <Star className="w-4.5 h-4.5 text-muted group-hover:text-orange transition-colors" />
+                {/* Icon box */}
+                <div style={{
+                  width: 38, height: 38, border: "2px solid var(--border-light)",
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  background: resource.affiliate ? "rgba(249,115,22,0.06)" : "var(--surface)",
+                }}>
+                  <ExternalLink style={{ width: 14, height: 14, color: resource.affiliate ? "var(--orange)" : "var(--ink-muted)" }} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-foreground">{resource.name}</p>
+
+                {/* Content */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                    <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", fontWeight: 700, color: "var(--navy)" }}>
+                      {resource.name}
+                    </span>
                     {resource.affiliate && (
-                      <span className="text-[10px] text-muted-light bg-surface px-1.5 py-0.5 rounded">
-                        Partner
-                      </span>
+                      <span className="affiliate-badge">Partner</span>
                     )}
                   </div>
                   {resource.description && (
-                    <p className="text-xs text-muted mt-0.5">{resource.description}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "var(--ink-muted)", lineHeight: 1.4 }}>
+                      {resource.description}
+                    </p>
                   )}
                 </div>
-                <ExternalLink className="w-4 h-4 text-muted-light group-hover:text-orange transition-colors flex-shrink-0" />
+
+                <ArrowRight style={{ width: 14, height: 14, color: "var(--ink-muted)", flexShrink: 0, opacity: 0.5 }} />
               </a>
             ))}
           </div>
         </div>
       )}
 
-      {/* Journal */}
-      <div className="bg-white rounded-2xl border border-border-light p-6">
-        <div className="flex items-center gap-2 mb-3">
-          <BookOpen className="w-4.5 h-4.5 text-orange" />
-          <h2 className="text-base font-semibold font-[family-name:var(--font-space-grotesk)] text-navy">
-            Journal Entry
-          </h2>
+      {/* ── Journal ───────────────────────────────────────── */}
+      <div className="panel" style={{ padding: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <BookOpen style={{ width: 14, height: 14, color: "var(--orange)" }} />
+          <span style={{
+            fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.2em",
+            textTransform: "uppercase", color: "var(--ink-muted)",
+          }}>
+            Journal this step
+          </span>
         </div>
-        <p className="text-sm text-muted mb-3 italic">
+        <p style={{
+          fontFamily: "var(--font-body)", fontSize: "0.82rem", color: "var(--orange)",
+          fontStyle: "italic", marginBottom: 12, lineHeight: 1.5,
+        }}>
           {step.journalPrompt}
         </p>
         <textarea
@@ -176,48 +205,44 @@ export default function StepDetailPage() {
           onChange={(e) => setJournalEntry(e.target.value)}
           placeholder="Write your thoughts here..."
           rows={4}
-          className="w-full px-4 py-3 border border-border rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange transition-colors"
+          style={{ resize: "none", marginBottom: 12 }}
         />
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-xs text-muted">
-            {saved ? "Saved!" : "Your entries are private to you."}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.7rem", color: "var(--ink-muted)" }}>
+            {saved ? "Saved!" : "Private to you."}
           </span>
           <button
             onClick={handleSaveJournal}
             disabled={!journalEntry.trim() || saving}
-            className="px-4 py-2 bg-orange text-white text-sm rounded-lg font-medium hover:bg-orange-hover transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="btn btn-primary"
+            style={{ fontSize: "0.72rem", padding: "8px 16px", opacity: !journalEntry.trim() || saving ? 0.5 : 1 }}
           >
-            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+            {saving ? <Loader2 style={{ width: 12, height: 12, animation: "spin 1s linear infinite" }} /> : null}
             Save entry
           </button>
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between pt-2">
+      {/* ── Step navigation ───────────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 4 }}>
         {prev ? (
-          <Link
-            href={`/checklist/${prev.id}`}
-            className="flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">{prev.title}</span>
-            <span className="sm:hidden">Previous</span>
+          <Link href={`/checklist/${prev.id}`} style={{
+            display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
+            fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 600,
+            letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--ink-muted)",
+          }}>
+            <ArrowLeft style={{ width: 13, height: 13 }} />
+            Previous
           </Link>
-        ) : (
-          <div />
-        )}
+        ) : <div />}
         {next ? (
-          <Link
-            href={`/checklist/${next.id}`}
-            className="flex items-center gap-2 text-sm text-orange font-medium hover:underline"
-          >
-            <span className="hidden sm:inline">{next.title}</span>
-            <span className="sm:hidden">Next</span>
-            <ArrowRight className="w-4 h-4" />
+          <Link href={`/checklist/${next.id}`} className="btn btn-primary" style={{ fontSize: "0.72rem", padding: "8px 16px" }}>
+            Next step <ArrowRight style={{ width: 13, height: 13 }} />
           </Link>
         ) : (
-          <div />
+          <Link href="/checklist" className="btn btn-primary" style={{ fontSize: "0.72rem", padding: "8px 16px" }}>
+            All done! <CheckCircle2 style={{ width: 13, height: 13 }} />
+          </Link>
         )}
       </div>
     </div>

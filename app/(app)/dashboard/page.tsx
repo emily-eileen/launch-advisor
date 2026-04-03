@@ -1,230 +1,190 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import {
-  Rocket,
-  ArrowRight,
-  CheckCircle2,
-  Circle,
-  Lightbulb,
-  FileText,
-  DollarSign,
-  Palette,
-  Shield,
-  BookOpen,
-  Sparkles,
-} from "lucide-react";
-import { phases } from "@/lib/data/checklist";
+import { ArrowRight, CheckCircle2, Clock, TrendingUp, Zap, BookOpen } from "lucide-react";
 
-// Mock data for development (works without Supabase)
-const mockProgress = {
-  completedSteps: 4,
-  totalSteps: 30,
-  phaseProgress: [
-    { phase: 1, completed: 3, total: 5 },
-    { phase: 2, completed: 1, total: 5 },
-    { phase: 3, completed: 0, total: 5 },
-    { phase: 4, completed: 0, total: 5 },
-    { phase: 5, completed: 0, total: 5 },
-    { phase: 6, completed: 0, total: 5 },
-  ],
-  nextStep: {
-    id: "decide-4",
-    title: "Validate your idea",
-    phase: "Decide",
-    description: "Before investing time and money, test whether real people will pay for what you offer.",
-  },
-};
-
-const mockJournalEntries = [
-  { id: "1", text: "Decided to start an online coaching business focused on career transitions. Feeling excited and a bit nervous.", stepTitle: "Define your business idea", createdAt: "2026-03-30T10:00:00Z" },
-  { id: "2", text: "Found 3 competitors. My edge is the personalized 1-on-1 approach plus my corporate background.", stepTitle: "Research your market", createdAt: "2026-03-31T14:30:00Z" },
-  { id: "3", text: "Going with professional services. It feels right for what I want to build.", stepTitle: "Choose your business type", createdAt: "2026-04-01T09:15:00Z" },
+const PHASES = [
+  { num: 1, name: "Decide", color: "#F97316", done: 5, total: 5 },
+  { num: 2, name: "Form", color: "#8B5CF6", done: 4, total: 5 },
+  { num: 3, name: "Money", color: "#16A34A", done: 3, total: 5 },
+  { num: 4, name: "Brand", color: "#0EA5E9", done: 2, total: 5 },
+  { num: 5, name: "Protect", color: "#EF4444", done: 0, total: 5 },
+  { num: 6, name: "Launch", color: "#F59E0B", done: 0, total: 5 },
 ];
 
-const phaseIcons: Record<string, React.ElementType> = {
-  Decide: Lightbulb,
-  Form: FileText,
-  "Set Up Money": DollarSign,
-  "Brand Basics": Palette,
-  Protect: Shield,
-  Launch: Rocket,
-};
+const RECENT_JOURNAL = [
+  { id: 1, text: "Validated idea with 12 potential customers. 9 said they'd pay.", date: "Apr 1" },
+  { id: 2, text: "Filed LLC with ZenBusiness. EIN received in 2 days.", date: "Mar 29" },
+];
+
+const TOTAL_DONE = PHASES.reduce((s, p) => s + p.done, 0);
+const TOTAL = 30;
+const NEXT_STEP = { phase: "Form", step: "Get your EIN", id: "form-4" };
 
 export default function DashboardPage() {
-  const progress = mockProgress;
-  const journalEntries = mockJournalEntries;
-  const percentage = Math.round((progress.completedSteps / progress.totalSteps) * 100);
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+      {/* ── Header ───────────────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-bold font-[family-name:var(--font-space-grotesk)] text-navy">
-          Your Launch Plan
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
+          <div style={{ height: 1, width: 32, background: "var(--orange)" }} />
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Your command center</span>
+        </div>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: "3rem", letterSpacing: "0.02em", color: "var(--navy)", lineHeight: 1 }}>
+          LAUNCH DASHBOARD
         </h1>
-        <p className="text-muted mt-1">
-          You are making progress. Keep going, one step at a time.
+        <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-muted)", fontSize: "0.9rem", marginTop: 6 }}>
+          You&apos;re {TOTAL_DONE} of {TOTAL} steps in. Keep going.
         </p>
       </div>
 
-      {/* Progress bar */}
-      <div className="bg-white rounded-2xl border border-border-light p-6">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-foreground">Overall Progress</span>
-          <span className="text-sm font-semibold text-orange">{percentage}% complete</span>
-        </div>
-        <div className="w-full bg-border-light rounded-full h-3">
-          <div
-            className="bg-orange rounded-full h-3 transition-all duration-500"
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-        <p className="text-xs text-muted mt-2">
-          {progress.completedSteps} of {progress.totalSteps} steps done
-        </p>
-      </div>
-
-      {/* Next Step card */}
-      <Link href={`/checklist/${progress.nextStep.id}`}>
-        <div className="bg-orange-light border-2 border-orange/20 rounded-2xl p-6 hover:border-orange/40 transition-colors cursor-pointer group">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium text-orange uppercase tracking-wide mb-1">
-                Your Next Step
-              </p>
-              <h2 className="text-lg font-semibold font-[family-name:var(--font-space-grotesk)] text-navy mb-1">
-                {progress.nextStep.title}
-              </h2>
-              <p className="text-sm text-muted">{progress.nextStep.description}</p>
-              <span className="inline-block mt-3 text-sm font-medium text-orange">
-                Phase: {progress.nextStep.phase}
+      {/* ── Top stat row ─────────────────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+        {[
+          { label: "Steps done", value: TOTAL_DONE, icon: CheckCircle2, color: "var(--orange)" },
+          { label: "Steps left", value: TOTAL - TOTAL_DONE, icon: Clock, color: "var(--navy)" },
+          { label: "Phases active", value: PHASES.filter(p => p.done > 0 && p.done < p.total).length, icon: TrendingUp, color: "#8B5CF6" },
+          { label: "Phases done", value: PHASES.filter(p => p.done === p.total).length, icon: Zap, color: "#16A34A" },
+        ].map((s) => (
+          <div key={s.label} className="stat-card">
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+              <div style={{ width: 32, height: 32, border: "2px solid var(--border-light)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <s.icon style={{ width: 15, height: 15, color: s.color }} />
+              </div>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ink-muted)" }}>
+                {s.label}
               </span>
             </div>
-            <div className="bg-orange text-white p-2.5 rounded-xl group-hover:translate-x-0.5 transition-transform">
-              <ArrowRight className="w-5 h-5" />
+            <div style={{ fontFamily: "var(--font-display)", fontSize: "2.8rem", color: s.color, lineHeight: 1 }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Overall progress + next step ─────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 16 }}>
+        {/* Progress */}
+        <div className="panel" style={{ padding: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--ink-muted)" }}>
+                Overall launch progress
+              </span>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: "2.5rem", color: "var(--navy)", lineHeight: 1, marginTop: 2 }}>
+                {Math.round((TOTAL_DONE / TOTAL) * 100)}%
+              </div>
+            </div>
+            <Link href="/checklist" className="btn btn-primary" style={{ fontSize: "0.72rem", padding: "8px 16px" }}>
+              Continue <ArrowRight style={{ width: 13, height: 13 }} />
+            </Link>
+          </div>
+
+          {/* Big progress bar */}
+          <div style={{ marginBottom: 24 }}>
+            <div className="progress-track" style={{ height: 12 }}>
+              <div className="progress-fill" style={{ width: `${(TOTAL_DONE / TOTAL) * 100}%` }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.68rem", color: "var(--ink-muted)", fontWeight: 600 }}>{TOTAL_DONE} done</span>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.68rem", color: "var(--ink-muted)", fontWeight: 600 }}>{TOTAL - TOTAL_DONE} remaining</span>
             </div>
           </div>
+
+          {/* Phase mini bars */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {PHASES.map((p) => (
+              <div key={p.num}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 8, height: 8, background: p.color }} />
+                    <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 700, color: "var(--ink-mid)" }}>
+                      {p.name}
+                    </span>
+                  </div>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "0.72rem", color: p.done === p.total ? p.color : "var(--ink-muted)" }}>
+                    {p.done}/{p.total}
+                  </span>
+                </div>
+                <div className="progress-track" style={{ height: 5 }}>
+                  <div style={{ height: "100%", width: `${(p.done / p.total) * 100}%`, background: p.color, transition: "width 0.6s ease" }} />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </Link>
 
-      {/* Phase overview */}
+        {/* Right column */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Next step */}
+          <div className="panel" style={{ borderLeft: "4px solid var(--orange)", padding: 20, boxShadow: "4px 4px 0 var(--orange)" }}>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--orange)" }}>
+              Next up
+            </span>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.4rem", letterSpacing: "0.02em", color: "var(--navy)", lineHeight: 1.1, margin: "6px 0 4px" }}>
+              {NEXT_STEP.step.toUpperCase()}
+            </h3>
+            <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.75rem", color: "var(--ink-muted)", marginBottom: 16 }}>
+              Phase: {NEXT_STEP.phase}
+            </p>
+            <Link href={`/checklist/${NEXT_STEP.id}`} className="btn btn-primary" style={{ width: "100%", justifyContent: "center", fontSize: "0.72rem", padding: "10px" }}>
+              Start this step <ArrowRight style={{ width: 13, height: 13 }} />
+            </Link>
+          </div>
+
+          {/* Journal snippet */}
+          <div className="panel" style={{ padding: 20, flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <BookOpen style={{ width: 14, height: 14, color: "var(--orange)" }} />
+                <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--ink-muted)" }}>
+                  Recent journal
+                </span>
+              </div>
+              <Link href="/journal" style={{ fontFamily: "var(--font-heading)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--orange)" }}>
+                View all →
+              </Link>
+            </div>
+            {RECENT_JOURNAL.map(j => (
+              <div key={j.id} style={{ borderLeft: "3px solid var(--orange)", paddingLeft: 12, marginBottom: 12 }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", color: "var(--ink-mid)", lineHeight: 1.5 }}>{j.text}</p>
+                <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.65rem", color: "var(--ink-muted)", marginTop: 3, fontWeight: 600 }}>{j.date}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Phase grid ───────────────────────────────────── */}
       <div>
-        <h2 className="text-lg font-semibold font-[family-name:var(--font-space-grotesk)] text-navy mb-4">
-          Your 6 Phases
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {phases.map((phase) => {
-            const pp = progress.phaseProgress.find((p) => p.phase === phase.number);
-            const Icon = phaseIcons[phase.name] || Circle;
-            const isComplete = pp && pp.completed === pp.total;
-            const isStarted = pp && pp.completed > 0;
-
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+          <div style={{ height: 1, width: 28, background: "var(--orange)" }} />
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--ink-muted)" }}>All phases</span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 10 }}>
+          {PHASES.map((p) => {
+            const pct = Math.round((p.done / p.total) * 100);
+            const isDone = p.done === p.total;
             return (
-              <Link key={phase.number} href="/checklist">
-                <div
-                  className={`bg-white rounded-xl border p-4 hover:shadow-sm transition-all cursor-pointer ${
-                    isComplete ? "border-success/30 bg-success-light/30" : "border-border-light"
-                  }`}
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                        isComplete
-                          ? "bg-success text-white"
-                          : isStarted
-                          ? "bg-orange-light text-orange"
-                          : "bg-surface text-muted"
-                      }`}
-                    >
-                      {isComplete ? (
-                        <CheckCircle2 className="w-4.5 h-4.5" />
-                      ) : (
-                        <Icon className="w-4.5 h-4.5" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{phase.name}</p>
-                      <p className="text-xs text-muted">
-                        {pp?.completed || 0}/{pp?.total || 5} steps
-                      </p>
-                    </div>
+              <Link key={p.num} href="/checklist" style={{ textDecoration: "none" }}>
+                <div className="panel"
+                  style={{ padding: "14px 14px 10px", cursor: "pointer", borderBottom: `4px solid ${p.color}`, transition: "box-shadow 0.15s" }}
+                  onMouseEnter={e => (e.currentTarget.style.boxShadow = `3px 3px 0 ${p.color}`)}
+                  onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", color: p.color, opacity: 0.3, lineHeight: 1 }}>0{p.num}</span>
+                    {isDone && <CheckCircle2 style={{ width: 14, height: 14, color: p.color }} />}
                   </div>
-                  <div className="w-full bg-border-light rounded-full h-1.5">
-                    <div
-                      className={`rounded-full h-1.5 transition-all ${
-                        isComplete ? "bg-success" : "bg-orange"
-                      }`}
-                      style={{
-                        width: `${((pp?.completed || 0) / (pp?.total || 5)) * 100}%`,
-                      }}
-                    />
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", letterSpacing: "0.05em", color: "var(--navy)", lineHeight: 1, marginBottom: 8 }}>
+                    {p.name.toUpperCase()}
+                  </p>
+                  <div className="progress-track" style={{ height: 4 }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: p.color }} />
                   </div>
+                  <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.62rem", color: "var(--ink-muted)", marginTop: 4 }}>{p.done}/{p.total}</p>
                 </div>
               </Link>
             );
           })}
-        </div>
-      </div>
-
-      {/* Recent journal entries */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold font-[family-name:var(--font-space-grotesk)] text-navy">
-            Recent Journal Entries
-          </h2>
-          <Link
-            href="/journal"
-            className="text-sm text-orange font-medium hover:underline flex items-center gap-1"
-          >
-            View all <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-        <div className="space-y-3">
-          {journalEntries.map((entry) => (
-            <div
-              key={entry.id}
-              className="bg-white rounded-xl border border-border-light p-4"
-            >
-              <div className="flex items-start gap-3">
-                <BookOpen className="w-4 h-4 text-muted-light mt-0.5 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-foreground line-clamp-2">{entry.text}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    {entry.stepTitle && (
-                      <span className="text-xs bg-orange-light text-orange px-2 py-0.5 rounded-full">
-                        {entry.stepTitle}
-                      </span>
-                    )}
-                    <span className="text-xs text-muted">
-                      {new Date(entry.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Upgrade prompt */}
-      <div className="bg-white rounded-2xl border border-border-light p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 bg-surface-warm rounded-xl flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-orange" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-navy mb-1">
-              Want personalized guidance?
-            </h3>
-            <p className="text-sm text-muted mb-3">
-              Upgrade to Pro for state-specific checklists, AI-powered recommendations, and priority support.
-            </p>
-            <button className="text-sm font-medium text-orange hover:underline">
-              Learn more about Pro
-            </button>
-          </div>
         </div>
       </div>
     </div>

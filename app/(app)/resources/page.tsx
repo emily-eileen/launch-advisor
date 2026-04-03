@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, Search } from "lucide-react";
+import { ExternalLink, Search, ArrowRight } from "lucide-react";
 
 interface Resource {
   id: string;
@@ -10,175 +10,234 @@ interface Resource {
   url: string;
   affiliateUrl?: string;
   category: string;
+  color: string;
 }
 
-const categories = [
-  "All",
-  "Entity Formation",
-  "Banking",
-  "Accounting",
-  "Branding",
-  "Website",
-  "Insurance",
-  "Legal",
-  "Marketing",
-  "Productivity",
-];
+const CATEGORY_META: Record<string, { color: string; label: string }> = {
+  "Entity Formation": { color: "#8B5CF6", label: "Entity Formation" },
+  "Banking":          { color: "#16A34A", label: "Banking" },
+  "Accounting":       { color: "#0EA5E9", label: "Accounting" },
+  "Branding":         { color: "#F97316", label: "Branding" },
+  "Website":          { color: "#1A2B4A", label: "Website" },
+  "Insurance":        { color: "#EF4444", label: "Insurance" },
+  "Legal":            { color: "#DC2626", label: "Legal" },
+  "Marketing":        { color: "#F59E0B", label: "Marketing" },
+  "Productivity":     { color: "#0EA5E9", label: "Productivity" },
+  "HR & Payroll":     { color: "#8B5CF6", label: "HR & Payroll" },
+  "E-commerce":       { color: "#F97316", label: "E-commerce" },
+};
+
+const categories = ["All", ...Object.keys(CATEGORY_META)];
 
 const resources: Resource[] = [
   // Entity Formation
-  { id: "r1", name: "ZenBusiness", description: "Fast, affordable LLC formation with registered agent service included.", url: "https://www.zenbusiness.com", affiliateUrl: "https://www.zenbusiness.com/?ref=launchadvisor", category: "Entity Formation" },
-  { id: "r2", name: "LegalZoom", description: "Well-known legal formation service with attorney access.", url: "https://www.legalzoom.com", affiliateUrl: "https://www.legalzoom.com/?ref=launchadvisor", category: "Entity Formation" },
-  { id: "r3", name: "Northwest Registered Agent", description: "Privacy-focused formation with free registered agent for a year.", url: "https://www.northwestregisteredagent.com", affiliateUrl: "https://www.northwestregisteredagent.com/?ref=launchadvisor", category: "Entity Formation" },
+  { id: "r1",  name: "ZenBusiness",               category: "Entity Formation", color: "#8B5CF6", description: "Fast, affordable LLC formation with registered agent service included.",       url: "https://www.zenbusiness.com",           affiliateUrl: "https://www.zenbusiness.com" },
+  { id: "r2",  name: "LegalZoom",                  category: "Entity Formation", color: "#8B5CF6", description: "Well-known legal formation with attorney access.",                            url: "https://www.legalzoom.com",             affiliateUrl: "https://www.legalzoom.com" },
+  { id: "r3",  name: "Northwest Registered Agent", category: "Entity Formation", color: "#8B5CF6", description: "Privacy-focused formation with free registered agent for a year.",            url: "https://www.northwestregisteredagent.com", affiliateUrl: "https://www.northwestregisteredagent.com" },
+  { id: "r4",  name: "Incfile",                    category: "Entity Formation", color: "#8B5CF6", description: "LLC formation starting at $0 + state fees — includes registered agent.",     url: "https://www.incfile.com",               affiliateUrl: "https://www.incfile.com" },
 
   // Banking
-  { id: "r4", name: "Mercury", description: "Modern business banking designed for startups and small businesses.", url: "https://mercury.com", affiliateUrl: "https://mercury.com/?ref=launchadvisor", category: "Banking" },
-  { id: "r5", name: "Relay", description: "Free business banking with multiple checking accounts and smart features.", url: "https://relayfi.com", affiliateUrl: "https://relayfi.com/?ref=launchadvisor", category: "Banking" },
-  { id: "r6", name: "Bluevine", description: "Business checking with interest on your balance.", url: "https://www.bluevine.com", affiliateUrl: "https://www.bluevine.com/?ref=launchadvisor", category: "Banking" },
+  { id: "r5",  name: "Mercury",                    category: "Banking",          color: "#16A34A", description: "Modern business banking designed for startups. No fees, no minimums.",       url: "https://mercury.com",                   affiliateUrl: "https://mercury.com" },
+  { id: "r6",  name: "Relay",                      category: "Banking",          color: "#16A34A", description: "Free business banking with multiple checking accounts and auto-save rules.",  url: "https://relayfi.com",                   affiliateUrl: "https://relayfi.com" },
+  { id: "r7",  name: "Bluevine",                   category: "Banking",          color: "#16A34A", description: "Business checking with 1.5% interest and no monthly fees.",                  url: "https://www.bluevine.com",              affiliateUrl: "https://www.bluevine.com" },
+  { id: "r8",  name: "Novo",                       category: "Banking",          color: "#16A34A", description: "Fee-free business checking built for small businesses and freelancers.",     url: "https://www.novo.co",                   affiliateUrl: "https://www.novo.co" },
 
   // Accounting
-  { id: "r7", name: "QuickBooks", description: "Industry-standard small business accounting and bookkeeping.", url: "https://quickbooks.intuit.com", affiliateUrl: "https://quickbooks.intuit.com/?ref=launchadvisor", category: "Accounting" },
-  { id: "r8", name: "Wave", description: "Completely free accounting software for small businesses.", url: "https://www.waveapps.com", category: "Accounting" },
-  { id: "r9", name: "FreshBooks", description: "Easy invoicing, expense tracking, and time tracking.", url: "https://www.freshbooks.com", affiliateUrl: "https://www.freshbooks.com/?ref=launchadvisor", category: "Accounting" },
+  { id: "r9",  name: "QuickBooks",                 category: "Accounting",       color: "#0EA5E9", description: "Industry-standard small business accounting and bookkeeping.",               url: "https://quickbooks.intuit.com",         affiliateUrl: "https://quickbooks.intuit.com" },
+  { id: "r10", name: "Wave",                        category: "Accounting",       color: "#0EA5E9", description: "Completely free accounting, invoicing, and receipt scanning.",                url: "https://www.waveapps.com",              affiliateUrl: "" },
+  { id: "r11", name: "FreshBooks",                  category: "Accounting",       color: "#0EA5E9", description: "Easy invoicing, expense tracking, and time tracking.",                      url: "https://www.freshbooks.com",            affiliateUrl: "https://www.freshbooks.com" },
+  { id: "r12", name: "Bench",                       category: "Accounting",       color: "#0EA5E9", description: "Dedicated bookkeeper + software. Perfect if you hate doing books.",         url: "https://bench.co",                      affiliateUrl: "https://bench.co" },
 
   // Branding
-  { id: "r10", name: "Canva", description: "Free design tool for logos, social media, and marketing materials.", url: "https://www.canva.com", category: "Branding" },
-  { id: "r11", name: "Looka", description: "AI-powered logo and brand kit generator.", url: "https://looka.com", affiliateUrl: "https://looka.com/?ref=launchadvisor", category: "Branding" },
-  { id: "r12", name: "Namecheap", description: "Affordable domain name registration and hosting.", url: "https://www.namecheap.com", affiliateUrl: "https://www.namecheap.com/?ref=launchadvisor", category: "Branding" },
+  { id: "r13", name: "Looka",                       category: "Branding",         color: "#F97316", description: "AI-powered logo and brand kit. Get a full brand identity in minutes.",      url: "https://looka.com",                     affiliateUrl: "https://looka.com" },
+  { id: "r14", name: "Canva",                        category: "Branding",         color: "#F97316", description: "Free design tool for logos, social graphics, and marketing materials.",   url: "https://www.canva.com",                 affiliateUrl: "" },
+  { id: "r15", name: "99designs",                    category: "Branding",         color: "#F97316", description: "Professional logo design from vetted freelance designers.",                url: "https://99designs.com",                 affiliateUrl: "https://99designs.com" },
+  { id: "r16", name: "Namecheap",                    category: "Branding",         color: "#F97316", description: "Affordable domain registration. Often the cheapest for .com domains.",     url: "https://www.namecheap.com",             affiliateUrl: "https://www.namecheap.com" },
 
   // Website
-  { id: "r13", name: "Squarespace", description: "Beautiful, easy-to-use website builder with templates.", url: "https://www.squarespace.com", affiliateUrl: "https://www.squarespace.com/?ref=launchadvisor", category: "Website" },
-  { id: "r14", name: "Carrd", description: "Simple, free one-page websites perfect for launching fast.", url: "https://carrd.co", affiliateUrl: "https://carrd.co/?ref=launchadvisor", category: "Website" },
-  { id: "r15", name: "WordPress.com", description: "Flexible website platform with thousands of themes and plugins.", url: "https://wordpress.com", category: "Website" },
+  { id: "r17", name: "Squarespace",                  category: "Website",          color: "#1A2B4A", description: "Beautiful drag-and-drop website builder with great templates.",             url: "https://www.squarespace.com",           affiliateUrl: "https://www.squarespace.com" },
+  { id: "r18", name: "Carrd",                         category: "Website",          color: "#1A2B4A", description: "Minimal one-page sites. Free tier is genuinely useful for MVPs.",          url: "https://carrd.co",                      affiliateUrl: "https://carrd.co" },
+  { id: "r19", name: "Webflow",                       category: "Website",          color: "#1A2B4A", description: "No-code website builder with full design control and CMS.",                url: "https://webflow.com",                   affiliateUrl: "https://webflow.com" },
+  { id: "r20", name: "Google Workspace",              category: "Website",          color: "#1A2B4A", description: "Professional email at your domain plus Docs, Sheets, Drive.",             url: "https://workspace.google.com",          affiliateUrl: "https://workspace.google.com" },
 
   // Insurance
-  { id: "r16", name: "Next Insurance", description: "Fast, online business insurance tailored to your industry.", url: "https://www.nextinsurance.com", affiliateUrl: "https://www.nextinsurance.com/?ref=launchadvisor", category: "Insurance" },
-  { id: "r17", name: "Hiscox", description: "Small business insurance specialists with flexible policies.", url: "https://www.hiscox.com", affiliateUrl: "https://www.hiscox.com/?ref=launchadvisor", category: "Insurance" },
+  { id: "r21", name: "Next Insurance",                category: "Insurance",        color: "#EF4444", description: "Fast, online business insurance tailored by industry. Quote in minutes.", url: "https://www.nextinsurance.com",         affiliateUrl: "https://www.nextinsurance.com" },
+  { id: "r22", name: "Hiscox",                         category: "Insurance",        color: "#EF4444", description: "Small business insurance specialists with flexible monthly plans.",        url: "https://www.hiscox.com",                affiliateUrl: "https://www.hiscox.com" },
+  { id: "r23", name: "Thimble",                         category: "Insurance",        color: "#EF4444", description: "Pay-per-job or monthly business insurance. Great for freelancers.",      url: "https://www.thimble.com",               affiliateUrl: "https://www.thimble.com" },
 
   // Legal
-  { id: "r18", name: "Rocket Lawyer", description: "Legal documents, contracts, and access to attorneys.", url: "https://www.rocketlawyer.com", affiliateUrl: "https://www.rocketlawyer.com/?ref=launchadvisor", category: "Legal" },
-  { id: "r19", name: "Termly", description: "Privacy policy and terms of service generator for websites.", url: "https://termly.io", affiliateUrl: "https://termly.io/?ref=launchadvisor", category: "Legal" },
+  { id: "r24", name: "Rocket Lawyer",                  category: "Legal",            color: "#DC2626", description: "Legal documents, contracts, and attorney access for small businesses.",  url: "https://www.rocketlawyer.com",          affiliateUrl: "https://www.rocketlawyer.com" },
+  { id: "r25", name: "Termly",                           category: "Legal",            color: "#DC2626", description: "Privacy policy and terms of service generator for websites.",           url: "https://termly.io",                     affiliateUrl: "https://termly.io" },
+  { id: "r26", name: "Trademarkia",                      category: "Legal",            color: "#DC2626", description: "Trademark search and filing service for protecting your brand.",        url: "https://www.trademarkia.com",           affiliateUrl: "https://www.trademarkia.com" },
 
   // Marketing
-  { id: "r20", name: "Mailchimp", description: "Email marketing platform for building your audience.", url: "https://mailchimp.com", affiliateUrl: "https://mailchimp.com/?ref=launchadvisor", category: "Marketing" },
-  { id: "r21", name: "ConvertKit", description: "Email marketing built for creators and small businesses.", url: "https://convertkit.com", affiliateUrl: "https://convertkit.com/?ref=launchadvisor", category: "Marketing" },
+  { id: "r27", name: "Mailchimp",                        category: "Marketing",        color: "#F59E0B", description: "Email marketing for small businesses. Free up to 500 subscribers.",   url: "https://mailchimp.com",                 affiliateUrl: "https://mailchimp.com" },
+  { id: "r28", name: "ConvertKit",                        category: "Marketing",        color: "#F59E0B", description: "Email marketing and automation built for creators and founders.",      url: "https://convertkit.com",                affiliateUrl: "https://convertkit.com" },
+  { id: "r29", name: "Buffer",                             category: "Marketing",        color: "#F59E0B", description: "Social media scheduling and analytics. Free plan is generous.",       url: "https://buffer.com",                    affiliateUrl: "https://buffer.com" },
+  { id: "r30", name: "Semrush",                            category: "Marketing",        color: "#F59E0B", description: "SEO, keyword research, and competitor analysis for growing traffic.", url: "https://www.semrush.com",               affiliateUrl: "https://www.semrush.com" },
 
   // Productivity
-  { id: "r22", name: "Calendly", description: "Easy scheduling for client calls and meetings.", url: "https://calendly.com", affiliateUrl: "https://calendly.com/?ref=launchadvisor", category: "Productivity" },
-  { id: "r23", name: "Google Workspace", description: "Professional email, docs, and productivity tools.", url: "https://workspace.google.com", affiliateUrl: "https://workspace.google.com/?ref=launchadvisor", category: "Productivity" },
-  { id: "r24", name: "Tally", description: "Free, beautiful form builder for surveys and feedback.", url: "https://tally.so", category: "Productivity" },
-];
+  { id: "r31", name: "Calendly",                           category: "Productivity",     color: "#0EA5E9", description: "Easy scheduling for client calls and meetings. Free tier available.", url: "https://calendly.com",                  affiliateUrl: "https://calendly.com" },
+  { id: "r32", name: "Notion",                              category: "Productivity",     color: "#0EA5E9", description: "All-in-one workspace for notes, projects, wikis, and databases.",     url: "https://www.notion.so",                 affiliateUrl: "https://www.notion.so" },
+  { id: "r33", name: "Typeform",                             category: "Productivity",     color: "#0EA5E9", description: "Beautiful interactive surveys and forms that people actually fill out.", url: "https://www.typeform.com",           affiliateUrl: "https://www.typeform.com" },
 
-const categoryColors: Record<string, string> = {
-  "Entity Formation": "bg-blue-50 text-blue-700",
-  Banking: "bg-green-50 text-green-700",
-  Accounting: "bg-purple-50 text-purple-700",
-  Branding: "bg-pink-50 text-pink-700",
-  Website: "bg-indigo-50 text-indigo-700",
-  Insurance: "bg-amber-50 text-amber-700",
-  Legal: "bg-red-50 text-red-700",
-  Marketing: "bg-cyan-50 text-cyan-700",
-  Productivity: "bg-emerald-50 text-emerald-700",
-};
+  // HR & Payroll
+  { id: "r34", name: "Gusto",                               category: "HR & Payroll",     color: "#8B5CF6", description: "Full-service payroll and HR for small businesses. Simple and reliable.", url: "https://gusto.com",                  affiliateUrl: "https://gusto.com" },
+  { id: "r35", name: "Rippling",                             category: "HR & Payroll",     color: "#8B5CF6", description: "Unified HR, IT, and finance platform for growing teams.",              url: "https://www.rippling.com",              affiliateUrl: "https://www.rippling.com" },
+
+  // E-commerce
+  { id: "r36", name: "Shopify",                              category: "E-commerce",       color: "#F97316", description: "The leading e-commerce platform. Easy to set up, powerful at scale.", url: "https://www.shopify.com",               affiliateUrl: "https://www.shopify.com" },
+  { id: "r37", name: "Gumroad",                               category: "E-commerce",       color: "#F97316", description: "Sell digital products, memberships, and courses with no setup fee.",  url: "https://gumroad.com",                   affiliateUrl: "" },
+];
 
 export default function ResourcesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
 
   const filtered = resources.filter((r) => {
-    const matchesCategory = selectedCategory === "All" || r.category === selectedCategory;
-    const matchesSearch =
-      search === "" ||
-      r.name.toLowerCase().includes(search.toLowerCase()) ||
-      r.description.toLowerCase().includes(search.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchCat = selectedCategory === "All" || r.category === selectedCategory;
+    const q = search.toLowerCase();
+    const matchSearch = !q || r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q) || r.category.toLowerCase().includes(q);
+    return matchCat && matchSearch;
   });
 
-  function handleResourceClick(resource: Resource) {
-    console.log("Resource click tracked:", {
-      resourceId: resource.id,
-      name: resource.name,
-      category: resource.category,
-      hasAffiliate: !!resource.affiliateUrl,
-    });
-  }
+  const affiliateCount = filtered.filter(r => r.affiliateUrl).length;
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+      {/* ── Header ─────────────────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-bold font-[family-name:var(--font-space-grotesk)] text-navy">
-          Resource Library
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
+          <div style={{ height: 1, width: 32, background: "var(--orange)" }} />
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-muted)" }}>
+            {resources.length} tools curated
+          </span>
+        </div>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: "3rem", letterSpacing: "0.02em", color: "var(--navy)", lineHeight: 1 }}>
+          RESOURCE LIBRARY
         </h1>
-        <p className="text-muted mt-1">
-          Curated tools and services to help you launch. We only recommend tools we trust.
+        <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-muted)", fontSize: "0.9rem", marginTop: 6 }}>
+          The best tools for every stage of launching. We only recommend what works.
         </p>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-light" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search resources..."
-          className="w-full pl-10 pr-4 py-3 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange transition-colors"
-        />
-      </div>
+      {/* ── Search + filter row ────────────────────────────── */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* Search */}
+        <div style={{ position: "relative" }}>
+          <Search style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "var(--ink-muted)" }} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search tools..."
+            style={{ paddingLeft: 36 }}
+          />
+        </div>
 
-      {/* Category filter */}
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0 lg:flex-wrap">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              selectedCategory === cat
-                ? "bg-orange text-white"
-                : "bg-white border border-border text-muted hover:text-foreground hover:border-foreground/20"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map((resource) => (
-          <a
-            key={resource.id}
-            href={resource.affiliateUrl || resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => handleResourceClick(resource)}
-            className="bg-white rounded-xl border border-border-light p-5 hover:border-orange/30 hover:shadow-sm transition-all group flex flex-col"
-          >
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className="text-base font-semibold text-foreground group-hover:text-orange transition-colors">
-                {resource.name}
-              </h3>
-              <ExternalLink className="w-4 h-4 text-muted-light group-hover:text-orange transition-colors flex-shrink-0 mt-0.5" />
-            </div>
-            <p className="text-sm text-muted flex-1">{resource.description}</p>
-            <div className="mt-3">
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                  categoryColors[resource.category] || "bg-gray-50 text-gray-700"
-                }`}
+        {/* Category pills */}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {categories.map((cat) => {
+            const isActive = selectedCategory === cat;
+            const meta = CATEGORY_META[cat];
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                style={{
+                  fontFamily: "var(--font-heading)", fontSize: "0.7rem", fontWeight: 700,
+                  letterSpacing: "0.06em", textTransform: "uppercase",
+                  padding: "5px 12px",
+                  border: `2px solid ${isActive ? (meta?.color || "var(--navy)") : "var(--border-light)"}`,
+                  background: isActive ? (meta?.color || "var(--navy)") : "transparent",
+                  color: isActive ? "white" : "var(--ink-muted)",
+                  cursor: "pointer", transition: "all 0.12s",
+                }}
               >
-                {resource.category}
-              </span>
-            </div>
-          </a>
-        ))}
+                {cat}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {filtered.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted">No resources found. Try a different search or category.</p>
+      {/* ── Results header ────────────────────────────────── */}
+      {filtered.length > 0 && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600, color: "var(--ink-muted)" }}>
+            {filtered.length} tool{filtered.length !== 1 ? "s" : ""} shown
+          </span>
+          {affiliateCount > 0 && (
+            <span style={{
+              fontFamily: "var(--font-display)", fontSize: "0.58rem", letterSpacing: "0.12em",
+              textTransform: "uppercase", color: "var(--orange)", border: "1.5px solid var(--orange)", padding: "2px 8px",
+            }}>
+              {affiliateCount} partner tool{affiliateCount !== 1 ? "s" : ""}
+            </span>
+          )}
         </div>
       )}
+
+      {/* ── Grid ──────────────────────────────────────────── */}
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "60px 20px" }}>
+          <p style={{ fontFamily: "var(--font-heading)", color: "var(--ink-muted)" }}>
+            No tools found. Try a different search or category.
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+          {filtered.map((resource) => {
+            const color = resource.color || "var(--navy)";
+            const hasAffiliate = !!resource.affiliateUrl;
+            return (
+              <a
+                key={resource.id}
+                href={resource.affiliateUrl || resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="resource-card"
+                style={{ textDecoration: "none", display: "flex", flexDirection: "column", borderBottom: `3px solid ${color}` }}
+              >
+                {/* Top row */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
+                  <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "0.92rem", fontWeight: 700, color: "var(--navy)", lineHeight: 1.2 }}>
+                    {resource.name}
+                  </h3>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                    {hasAffiliate && <span className="affiliate-badge">Partner</span>}
+                    <ExternalLink style={{ width: 12, height: 12, color: "var(--ink-muted)", opacity: 0.5 }} />
+                  </div>
+                </div>
+
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", color: "var(--ink-muted)", lineHeight: 1.5, flex: 1, marginBottom: 10 }}>
+                  {resource.description}
+                </p>
+
+                {/* Category + cta */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{
+                    fontFamily: "var(--font-display)", fontSize: "0.55rem", letterSpacing: "0.12em",
+                    textTransform: "uppercase", padding: "2px 6px",
+                    border: `1.5px solid ${color}`, color,
+                  }}>
+                    {resource.category}
+                  </span>
+                  <ArrowRight style={{ width: 12, height: 12, color, opacity: 0.6 }} />
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── Affiliate disclosure ──────────────────────────── */}
+      <div style={{ padding: "14px 18px", background: "rgba(249,115,22,0.04)", border: "1px solid rgba(249,115,22,0.15)" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", color: "var(--ink-muted)", lineHeight: 1.5 }}>
+          <strong style={{ color: "var(--ink-mid)" }}>Affiliate disclosure:</strong> Some tools on this page use affiliate links. If you sign up through our link, we may earn a commission at no extra cost to you. We only recommend tools we genuinely believe in.
+        </p>
+      </div>
     </div>
   );
 }

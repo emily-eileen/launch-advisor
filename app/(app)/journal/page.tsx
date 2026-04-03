@@ -1,13 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  BookOpen,
-  Plus,
-  X,
-  Calendar,
-  Loader2,
-} from "lucide-react";
+import { BookOpen, Plus, X, Calendar, Loader2 } from "lucide-react";
 
 interface JournalEntry {
   id: string;
@@ -17,7 +11,6 @@ interface JournalEntry {
   createdAt: string;
 }
 
-// Mock data for development
 const mockEntries: JournalEntry[] = [
   {
     id: "1",
@@ -54,6 +47,12 @@ const mockEntries: JournalEntry[] = [
   },
 ];
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+}
+
 export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>(mockEntries);
   const [showForm, setShowForm] = useState(false);
@@ -63,16 +62,12 @@ export default function JournalPage() {
   async function handleSave() {
     if (!newEntry.trim()) return;
     setSaving(true);
-
-    // In production, save to Supabase
     await new Promise((r) => setTimeout(r, 500));
-
     const entry: JournalEntry = {
       id: String(Date.now()),
       text: newEntry,
       createdAt: new Date().toISOString(),
     };
-
     setEntries([entry, ...entries]);
     setNewEntry("");
     setShowForm(false);
@@ -80,101 +75,113 @@ export default function JournalPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
+      {/* ── Header ─────────────────────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
         <div>
-          <h1 className="text-2xl font-bold font-[family-name:var(--font-space-grotesk)] text-navy">
-            Launch Journal
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
+            <div style={{ height: 1, width: 32, background: "var(--orange)" }} />
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-muted)" }}>
+              Your journey
+            </span>
+          </div>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "3rem", letterSpacing: "0.02em", color: "var(--navy)", lineHeight: 1 }}>
+            LAUNCH JOURNAL
           </h1>
-          <p className="text-muted mt-1">
-            Track your journey, reflect on your progress, and remember how far you have come.
+          <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-muted)", fontSize: "0.9rem", marginTop: 6 }}>
+            Track your decisions, wins, and reflections as you build.
           </p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-orange text-white rounded-xl text-sm font-medium hover:bg-orange-hover transition-colors"
+          className="btn btn-primary"
+          style={{ fontSize: "0.72rem", padding: "10px 18px", flexShrink: 0, marginTop: 8 }}
         >
-          {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          {showForm ? <X style={{ width: 13, height: 13 }} /> : <Plus style={{ width: 13, height: 13 }} />}
           {showForm ? "Cancel" : "New Entry"}
         </button>
       </div>
 
-      {/* New entry form */}
+      {/* ── New entry form ─────────────────────────────────── */}
       {showForm && (
-        <div className="bg-white rounded-2xl border border-border-light p-6">
-          <h2 className="text-base font-semibold font-[family-name:var(--font-space-grotesk)] text-navy mb-3">
-            New Journal Entry
-          </h2>
+        <div className="panel" style={{ padding: 24, borderLeft: "4px solid var(--orange)", boxShadow: "4px 4px 0 var(--orange)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <BookOpen style={{ width: 14, height: 14, color: "var(--orange)" }} />
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--orange)" }}>
+              New Entry
+            </span>
+          </div>
           <textarea
             value={newEntry}
             onChange={(e) => setNewEntry(e.target.value)}
-            placeholder="What is on your mind? Record a decision, a win, a worry, or just how you are feeling about your launch..."
-            rows={4}
+            placeholder="What is on your mind? Record a decision, a win, a worry, or just how you feel about your launch..."
+            rows={5}
             autoFocus
-            className="w-full px-4 py-3 border border-border rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange transition-colors"
+            style={{ resize: "none", marginBottom: 12 }}
           />
-          <div className="flex justify-end mt-3">
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button
               onClick={handleSave}
               disabled={!newEntry.trim() || saving}
-              className="px-5 py-2.5 bg-orange text-white text-sm rounded-xl font-medium hover:bg-orange-hover transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="btn btn-primary"
+              style={{ fontSize: "0.72rem", padding: "10px 20px", opacity: !newEntry.trim() || saving ? 0.5 : 1 }}
             >
-              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              {saving && <Loader2 style={{ width: 12, height: 12 }} />}
               Save Entry
             </button>
           </div>
         </div>
       )}
 
-      {/* Timeline */}
-      <div className="space-y-4">
-        {entries.length === 0 ? (
-          <div className="text-center py-16">
-            <BookOpen className="w-12 h-12 text-border mx-auto mb-4" />
-            <h3 className="text-base font-medium text-foreground mb-1">
-              No entries yet
-            </h3>
-            <p className="text-sm text-muted">
-              Start writing about your journey. Your future self will thank you.
-            </p>
-          </div>
-        ) : (
-          entries.map((entry) => (
-            <div
-              key={entry.id}
-              className="bg-white rounded-xl border border-border-light p-5"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-orange-light rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <BookOpen className="w-4 h-4 text-orange" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                    {entry.text}
-                  </p>
-                  <div className="flex items-center flex-wrap gap-2 mt-3">
-                    {entry.stepTitle && (
-                      <span className="text-xs bg-orange-light text-orange px-2.5 py-0.5 rounded-full font-medium">
-                        {entry.stepTitle}
-                      </span>
-                    )}
-                    <span className="text-xs text-muted flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(entry.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                </div>
+      {/* ── Entry count ─────────────────────────────────────── */}
+      {entries.length > 0 && (
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ height: 1, flex: 1, background: "var(--border-light)" }} />
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--ink-muted)", flexShrink: 0 }}>
+            {entries.length} entries
+          </span>
+          <div style={{ height: 1, flex: 1, background: "var(--border-light)" }} />
+        </div>
+      )}
+
+      {/* ── Timeline ──────────────────────────────────────── */}
+      {entries.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "80px 20px" }}>
+          <BookOpen style={{ width: 40, height: 40, color: "var(--border-light)", margin: "0 auto 16px" }} />
+          <p style={{ fontFamily: "var(--font-heading)", fontWeight: 700, color: "var(--ink-mid)", marginBottom: 8 }}>
+            No entries yet
+          </p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", color: "var(--ink-muted)" }}>
+            Start writing about your journey. Your future self will thank you.
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {entries.map((entry) => (
+            <div key={entry.id} className="journal-card">
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "0.88rem", color: "var(--ink-mid)", lineHeight: 1.7, marginBottom: 12 }}>
+                {entry.text}
+              </p>
+              <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+                {entry.stepTitle && (
+                  <span style={{
+                    fontFamily: "var(--font-display)", fontSize: "0.58rem", letterSpacing: "0.12em",
+                    textTransform: "uppercase", padding: "2px 8px",
+                    border: "1.5px solid var(--orange)", color: "var(--orange)",
+                  }}>
+                    {entry.stepTitle}
+                  </span>
+                )}
+                <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "var(--font-heading)", fontSize: "0.68rem", fontWeight: 600, color: "var(--ink-muted)" }}>
+                  <Calendar style={{ width: 11, height: 11 }} />
+                  {formatDate(entry.createdAt)}
+                </span>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
