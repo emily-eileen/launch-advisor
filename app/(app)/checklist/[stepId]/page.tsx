@@ -1,15 +1,155 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, ExternalLink,
-  BookOpen, Loader2, Zap,
+  BookOpen, Loader2, Zap, ChevronDown, HelpCircle,
 } from "lucide-react";
 import { getStepById, getAdjacentSteps } from "@/lib/data/checklist";
+import { getGuidesForStep } from "@/lib/data/guides/index";
+import type { Guide } from "@/lib/data/guides/types";
 
 const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899", "#06B6D4", "#A855F7", "#14B8A6"];
+
+function FaqArticle({ guide, color }: { guide: Guide; color: string }) {
+  const [open, setOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  return (
+    <div style={{ border: "1px solid var(--border-light)", background: "var(--surface)" }}>
+      {/* Article header — always visible */}
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+          gap: 12, padding: "14px 16px", background: "transparent", cursor: "pointer",
+          borderBottom: open ? "1px solid var(--border-light)" : "none", textAlign: "left",
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{
+            fontFamily: "var(--font-heading)", fontSize: "0.88rem", fontWeight: 700,
+            color: "var(--navy)", lineHeight: 1.3, marginBottom: 2,
+          }}>
+            {guide.title}
+          </p>
+          {!open && (
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "var(--ink-muted)", lineHeight: 1.4 }}>
+              {guide.intro.slice(0, 110)}{guide.intro.length > 110 ? "…" : ""}
+            </p>
+          )}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          <span style={{
+            fontFamily: "var(--font-display)", fontSize: "0.6rem", letterSpacing: "0.15em",
+            color: "var(--ink-muted)", textTransform: "uppercase",
+          }}>
+            {guide.readTime} min
+          </span>
+          <ChevronDown style={{
+            width: 14, height: 14, color: "var(--ink-muted)",
+            transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s",
+          }} />
+        </div>
+      </button>
+
+      {/* Expanded content */}
+      {open && (
+        <div style={{ padding: "16px 16px 20px" }}>
+          {/* Intro */}
+          <p style={{
+            fontFamily: "var(--font-body)", fontSize: "0.88rem", color: "var(--ink-mid)",
+            lineHeight: 1.65, marginBottom: 20,
+            borderLeft: `3px solid ${color}`, paddingLeft: 12,
+          }}>
+            {guide.intro}
+          </p>
+
+          {/* FAQs */}
+          {guide.faqs.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {guide.faqs.map((faq, i) => (
+                <div key={i} style={{ borderTop: "1px solid var(--border-light)" }}>
+                  <button
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    style={{
+                      width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+                      gap: 10, padding: "12px 0", background: "transparent", cursor: "pointer", textAlign: "left",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8, flex: 1 }}>
+                      <HelpCircle style={{ width: 13, height: 13, color, flexShrink: 0, marginTop: 2 }} />
+                      <span style={{
+                        fontFamily: "var(--font-heading)", fontSize: "0.83rem", fontWeight: 700,
+                        color: openFaq === i ? color : "var(--navy)", lineHeight: 1.3, transition: "color 0.15s",
+                      }}>
+                        {faq.question}
+                      </span>
+                    </div>
+                    <ChevronDown style={{
+                      width: 13, height: 13, color: "var(--ink-muted)", flexShrink: 0,
+                      transform: openFaq === i ? "rotate(180deg)" : "none", transition: "transform 0.2s",
+                    }} />
+                  </button>
+                  {openFaq === i && (
+                    <p style={{
+                      fontFamily: "var(--font-body)", fontSize: "0.83rem", color: "var(--ink-mid)",
+                      lineHeight: 1.6, paddingBottom: 14, paddingLeft: 21,
+                    }}>
+                      {faq.answer}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Affiliate tools */}
+          {guide.affiliates.length > 0 && (
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border-light)" }}>
+              <p style={{
+                fontFamily: "var(--font-display)", fontSize: "0.58rem", letterSpacing: "0.2em",
+                textTransform: "uppercase", color: "var(--ink-muted)", marginBottom: 10,
+              }}>
+                Recommended tools
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {guide.affiliates.slice(0, 4).map((aff, i) => (
+                  <a
+                    key={i}
+                    href={aff.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600,
+                      color: "var(--navy)", textDecoration: "none",
+                      border: "1.5px solid var(--border-light)", padding: "5px 10px",
+                      background: "var(--surface-warm)", transition: "all 0.15s",
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = color; (e.currentTarget as HTMLElement).style.color = color; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border-light)"; (e.currentTarget as HTMLElement).style.color = "var(--navy)"; }}
+                  >
+                    {aff.name}
+                    {aff.badge && (
+                      <span style={{
+                        fontFamily: "var(--font-display)", fontSize: "0.55rem", letterSpacing: "0.12em",
+                        background: color, color: "white", padding: "1px 5px",
+                      }}>{aff.badge}</span>
+                    )}
+                    <ExternalLink style={{ width: 10, height: 10, opacity: 0.5 }} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function StepDetailPage() {
   const params = useParams();
@@ -21,6 +161,11 @@ export default function StepDetailPage() {
   const [journalEntry, setJournalEntry] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [relatedGuides, setRelatedGuides] = useState<Guide[]>([]);
+
+  useEffect(() => {
+    getGuidesForStep(stepId).then(setRelatedGuides).catch(() => {});
+  }, [stepId]);
 
   if (!step) {
     return (
@@ -150,7 +295,6 @@ export default function StepDetailPage() {
                 className="resource-card"
                 style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 14 }}
               >
-                {/* Icon box */}
                 <div style={{
                   width: 38, height: 38, border: "2px solid var(--border-light)",
                   display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
@@ -158,8 +302,6 @@ export default function StepDetailPage() {
                 }}>
                   <ExternalLink style={{ width: 14, height: 14, color: resource.affiliate ? "var(--orange)" : "var(--ink-muted)" }} />
                 </div>
-
-                {/* Content */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
                     <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", fontWeight: 700, color: "var(--navy)" }}>
@@ -175,9 +317,28 @@ export default function StepDetailPage() {
                     </p>
                   )}
                 </div>
-
                 <ArrowRight style={{ width: 14, height: 14, color: "var(--ink-muted)", flexShrink: 0, opacity: 0.5 }} />
               </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── FAQ Articles ──────────────────────────────────── */}
+      {relatedGuides.length > 0 && (
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+            <div style={{ height: 1, width: 24, background: color }} />
+            <span style={{
+              fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em",
+              textTransform: "uppercase", color: "var(--ink-muted)",
+            }}>
+              Common Questions
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {relatedGuides.map((guide) => (
+              <FaqArticle key={guide.slug} guide={guide} color={color} />
             ))}
           </div>
         </div>

@@ -35,3 +35,8 @@ export async function getGuidesByPhaseName(phaseName: string): Promise<Guide[]> 
   const all = await getAllGuides();
   return all.filter((g) => g.phaseName.toLowerCase() === phaseName.toLowerCase());
 }
+
+export async function getGuidesForStep(stepId: string): Promise<Guide[]> {
+  const all = await getAllGuides();
+  return all.filter((g) => g.checklistStepIds.includes(stepId));
+}
