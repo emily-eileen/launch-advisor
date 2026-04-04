@@ -4,47 +4,81 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Rocket } from "lucide-react";
 
+// Business category values map to the top 20 NAICS codes in launchadvisor.yaml
+// Used to filter guide articles shown on step detail pages
+export const BUSINESS_CATEGORIES = [
+  { value: "consulting",      label: "Consulting / Coaching",     desc: "Business, life, HR, or strategy consulting — selling expertise by the hour or project" },
+  { value: "tech",            label: "Tech / IT / App",           desc: "Freelance dev, IT support, SaaS product, AI services, web design" },
+  { value: "creative",        label: "Creative Services",         desc: "Photography, videography, graphic design, copywriting, social media management" },
+  { value: "home-services",   label: "Home & Property Services",  desc: "Cleaning, lawn care, handyman, pressure washing, property maintenance" },
+  { value: "trades",          label: "Trades & Construction",     desc: "Contractor, electrician, plumber, painter, roofer — skilled trades going independent" },
+  { value: "food",            label: "Food & Beverage",           desc: "Food truck, ghost kitchen, catering, home bakery, pop-up restaurant" },
+  { value: "str",             label: "Short-Term Rental / Airbnb", desc: "First Airbnb listing, VRBO host, vacation rental" },
+  { value: "ecommerce",       label: "E-Commerce / Retail",       desc: "Shopify store, Etsy shop, Amazon reseller, online products, reselling" },
+  { value: "beauty-wellness", label: "Beauty / Wellness / Fitness", desc: "Hair stylist, nail tech, personal trainer, yoga instructor, esthetician" },
+  { value: "care-services",   label: "Care & Personal Services",  desc: "Dog walking, pet sitting, childcare, babysitting, errands, concierge" },
+];
+
 const QUESTIONS = [
   {
     id: "stage",
-    question: "Where are you in your launch journey?",
+    question: "Where are you in your launch?",
     sub: "We'll skip steps you've already completed.",
     options: [
-      { value: "idea",       label: "Just an idea",              desc: "I haven't started anything yet" },
-      { value: "named",      label: "I have a concept",          desc: "Named it, maybe bought a domain" },
-      { value: "registered", label: "Already registered",        desc: "I have an LLC or Corp filed" },
-      { value: "open",       label: "Open but disorganized",     desc: "Running but missing key steps" },
+      { value: "idea",       label: "Just an idea",           desc: "Haven't started anything yet" },
+      { value: "named",      label: "I have a concept",       desc: "Named it, maybe bought a domain" },
+      { value: "registered", label: "Already registered",     desc: "I have an LLC or Corp filed" },
+      { value: "open",       label: "Open but missing steps", desc: "Running but gaps in the foundation" },
     ],
   },
   {
-    id: "type",
-    question: "What kind of business are you building?",
-    sub: "We'll surface the most relevant tools for your model.",
+    id: "businessType",
+    question: "What kind of business?",
+    sub: "We'll surface the most relevant guides and tools for your model.",
+    options: BUSINESS_CATEGORIES,
+    grid: 2, // 2-col grid
+    scroll: true, // scrollable since there are 10 options
+  },
+  {
+    id: "goal",
+    question: "What's your #1 goal right now?",
+    sub: "We'll weight the checklist toward what matters most to you.",
     options: [
-      { value: "service",   label: "Service / Consulting",  desc: "Agency, freelance, coaching, B2B" },
-      { value: "ecommerce", label: "Product / E-commerce",  desc: "Physical or digital products" },
-      { value: "saas",      label: "SaaS / App",            desc: "Software, subscriptions, tech" },
-      { value: "local",     label: "Local / Brick & Mortar", desc: "Retail, restaurant, trades" },
+      { value: "legal",     label: "Get legally set up",      desc: "Formation, licenses, contracts, compliance" },
+      { value: "money",     label: "Sort out the finances",   desc: "Bank account, accounting, taxes, pricing" },
+      { value: "customers", label: "Get my first customers",  desc: "Marketing, outreach, brand, first sale" },
+      { value: "build",     label: "Build the product/offer", desc: "Website, menu, service package, delivery" },
+    ],
+  },
+  {
+    id: "timeline",
+    question: "When do you want to be open?",
+    sub: "We'll prioritize steps based on your runway.",
+    options: [
+      { value: "now",      label: "I'm open now",         desc: "Already taking clients or customers" },
+      { value: "30days",   label: "Within 30 days",       desc: "Very close — need to move fast" },
+      { value: "90days",   label: "Within 90 days",       desc: "Have a bit of time to do it right" },
+      { value: "exploring", label: "Still exploring",     desc: "No hard deadline yet" },
     ],
   },
   {
     id: "concern",
-    question: "What's your biggest worry right now?",
-    sub: "We'll prioritize the phases that matter most to you.",
+    question: "What worries you most?",
+    sub: "We'll flag the most common mistakes for businesses like yours.",
     options: [
-      { value: "legal",     label: "Doing it wrong legally",    desc: "Formation, contracts, compliance" },
-      { value: "money",     label: "Banking & finances",        desc: "Accounts, credit, accounting" },
-      { value: "customers", label: "Getting first customers",   desc: "Marketing, sales, brand" },
-      { value: "product",   label: "Building the product",      desc: "Tech, ops, delivery" },
+      { value: "legal",    label: "Doing it wrong legally",  desc: "Formation, contracts, compliance" },
+      { value: "money",    label: "Running out of money",    desc: "Startup costs, cash flow, pricing" },
+      { value: "obscure",  label: "Nobody finds me",        desc: "Marketing, visibility, first customers" },
+      { value: "wrong",    label: "Building the wrong thing", desc: "Wasting time on what nobody wants" },
     ],
   },
 ];
 
-const ACCENT_COLORS = ["#F97316", "#8B5CF6", "#16A34A"];
+const ACCENT_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444"];
 
 export default function QuizPage() {
   const router = useRouter();
-  const [step, setStep] = useState(0); // 0,1,2 = questions; 3 = loader
+  const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -63,14 +97,13 @@ export default function QuizPage() {
     setSelected(null);
 
     if (isLast) {
-      // Save to localStorage and show loader
       if (typeof window !== "undefined") {
         localStorage.setItem("launchadvisor_quiz", JSON.stringify({
           ...next,
           completedAt: new Date().toISOString(),
         }));
       }
-      setStep(3);
+      setStep(QUESTIONS.length); // loader
       setTimeout(() => router.push("/checklist"), 2000);
     } else {
       setStep(step + 1);
@@ -78,7 +111,7 @@ export default function QuizPage() {
   }
 
   // Loader screen
-  if (step === 3) {
+  if (step === QUESTIONS.length) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--navy)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)", backgroundSize: "20px 20px", pointerEvents: "none" }} />
@@ -90,7 +123,7 @@ export default function QuizPage() {
             BUILDING<br />YOUR PLAN
           </h2>
           <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.5)", fontSize: "0.95rem", marginBottom: 32 }}>
-            Personalizing your 30-step checklist...
+            Personalizing your checklist...
           </p>
           <div style={{ height: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden", border: "1px solid rgba(255,255,255,0.15)" }}>
             <div style={{ height: "100%", background: "var(--orange)", animation: "progressGrow 2s cubic-bezier(0.4,0,0.2,1) forwards" }} />
@@ -100,9 +133,11 @@ export default function QuizPage() {
     );
   }
 
+  const useScroll = (q as { scroll?: boolean }).scroll;
+  const gridCols = (q as { grid?: number }).grid ?? 2;
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--navy)", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
-      {/* Background dot pattern */}
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)", backgroundSize: "20px 20px", pointerEvents: "none" }} />
 
       {/* Header */}
@@ -110,7 +145,6 @@ export default function QuizPage() {
         <span style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", letterSpacing: "0.05em", color: "white" }}>
           LAUNCH<span style={{ color: "var(--orange)" }}>ADVISOR</span>
         </span>
-        {/* Progress dots */}
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {QUESTIONS.map((_, i) => (
             <div key={i} style={{
@@ -125,9 +159,8 @@ export default function QuizPage() {
 
       {/* Question */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px", position: "relative" }}>
-        <div style={{ width: "100%", maxWidth: 600 }}>
+        <div style={{ width: "100%", maxWidth: 640 }}>
 
-          {/* Step label */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
             <div style={{ height: 2, width: 32, background: color }} />
             <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
@@ -135,16 +168,25 @@ export default function QuizPage() {
             </span>
           </div>
 
-          {/* Question text */}
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "0.02em", color: "white", lineHeight: 1.05, marginBottom: 10 }}>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 5vw, 3.2rem)", letterSpacing: "0.02em", color: "white", lineHeight: 1.05, marginBottom: 10 }}>
             {q.question}
           </h1>
-          <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.45)", fontSize: "0.95rem", marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.45)", fontSize: "0.95rem", marginBottom: 28 }}>
             {q.sub}
           </p>
 
-          {/* Options */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 32 }}>
+          {/* Options — scrollable container for the business type question */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+              gap: 10,
+              marginBottom: 28,
+              maxHeight: useScroll ? "340px" : "none",
+              overflowY: useScroll ? "auto" : "visible",
+              paddingRight: useScroll ? 4 : 0,
+            }}
+          >
             {q.options.map((opt) => {
               const isSelected = selected === opt.value;
               return (
@@ -152,7 +194,7 @@ export default function QuizPage() {
                   key={opt.value}
                   onClick={() => handleSelect(opt.value)}
                   style={{
-                    padding: "18px 20px",
+                    padding: "14px 16px",
                     border: `2px solid ${isSelected ? color : "rgba(255,255,255,0.15)"}`,
                     background: isSelected ? `${color}22` : "rgba(255,255,255,0.04)",
                     cursor: "pointer",
@@ -162,10 +204,10 @@ export default function QuizPage() {
                     transform: isSelected ? "translate(-2px, -2px)" : "none",
                   }}
                 >
-                  <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.92rem", fontWeight: 700, color: isSelected ? "white" : "rgba(255,255,255,0.8)", marginBottom: 4 }}>
+                  <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.88rem", fontWeight: 700, color: isSelected ? "white" : "rgba(255,255,255,0.8)", marginBottom: 3 }}>
                     {opt.label}
                   </p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: isSelected ? "rgba(255,255,255,0.65)" : "rgba(255,255,255,0.35)", lineHeight: 1.4 }}>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", color: isSelected ? "rgba(255,255,255,0.65)" : "rgba(255,255,255,0.35)", lineHeight: 1.4 }}>
                     {opt.desc}
                   </p>
                 </button>
@@ -173,7 +215,6 @@ export default function QuizPage() {
             })}
           </div>
 
-          {/* Next button */}
           <button
             onClick={handleNext}
             disabled={!selected}

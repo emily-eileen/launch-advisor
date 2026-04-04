@@ -33,4 +33,8 @@ export interface Guide {
   faqs: GuideFaq[];
   relatedSlugs: string[];
   publishedAt: string; // ISO date string
+  // Optional: filter this guide to specific business types from the quiz
+  // Values match BUSINESS_CATEGORIES values in app/quiz/page.tsx
+  // Omit to show this guide to all business types (universal)
+  businessTypes?: string[];
 }

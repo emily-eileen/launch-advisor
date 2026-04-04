@@ -25,18 +25,40 @@ export interface Phase {
   description: string;
 }
 
+// Phase display order: Validate → Form → Finance → Build → Brand → Protect → Locate → Price → Sell → Operate
+// The number field is the stable ID (used in step data and URLs). The array order controls display sequence.
 export const phases: Phase[] = [
   { number: 1,  name: "Validate", icon: "Search",     description: "Confirm real people will pay for your idea before you spend a dollar" },
-  { number: 2,  name: "Build",    icon: "Hammer",     description: "Create your product or design your service offer" },
-  { number: 3,  name: "Price",    icon: "Tag",        description: "Set your price with confidence from day one" },
   { number: 4,  name: "Form",     icon: "FileText",   description: "Make your business official and legally protected" },
   { number: 5,  name: "Finance",  icon: "DollarSign", description: "Build the financial foundation that compounds over time" },
-  { number: 6,  name: "Locate",   icon: "MapPin",     description: "Place your business — online, offline, or both" },
+  { number: 2,  name: "Build",    icon: "Hammer",     description: "Create your product or design your service offer" },
   { number: 7,  name: "Brand",    icon: "Palette",    description: "Build the identity that earns trust before anyone speaks to you" },
   { number: 8,  name: "Protect",  icon: "Shield",     description: "Prevent the five things that shut down businesses before year two" },
+  { number: 6,  name: "Locate",   icon: "MapPin",     description: "Place your business — online, offline, or both" },
+  { number: 3,  name: "Price",    icon: "Tag",        description: "Set your price with confidence from day one" },
   { number: 9,  name: "Sell",     icon: "Users",      description: "Get your first paying customer this week" },
   { number: 10, name: "Operate",  icon: "Settings",   description: "Build systems so the business runs — and grows — without you" },
 ];
+
+// Phase colors by display position (index 0–9 in the phases array above)
+export const PHASE_COLORS = [
+  "#F97316", // 0 Validate  — orange
+  "#8B5CF6", // 1 Form      — purple
+  "#16A34A", // 2 Finance   — green
+  "#0EA5E9", // 3 Build     — blue
+  "#EF4444", // 4 Brand     — red
+  "#F59E0B", // 5 Protect   — amber
+  "#EC4899", // 6 Locate    — pink
+  "#06B6D4", // 7 Price     — cyan
+  "#A855F7", // 8 Sell      — violet
+  "#14B8A6", // 9 Operate   — teal
+];
+
+/** Returns the display color for a phase by its number (stable ID). */
+export function getPhaseColor(phaseNumber: number): string {
+  const idx = phases.findIndex((p) => p.number === phaseNumber);
+  return idx >= 0 ? PHASE_COLORS[idx] : "#F97316";
+}
 
 export const checklistSteps: ChecklistStep[] = [
 

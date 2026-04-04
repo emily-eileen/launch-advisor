@@ -3,10 +3,16 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight } from "lucide-react";
-import { phases, checklistSteps } from "@/lib/data/checklist";
+import {
+  ArrowLeft, ArrowRight, CheckCircle2, ChevronRight,
+  Search, Hammer, Tag, FileText, DollarSign, MapPin, Palette, Shield, Users, Settings,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { phases, checklistSteps, getPhaseColor } from "@/lib/data/checklist";
 
-const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899", "#06B6D4", "#A855F7", "#14B8A6"];
+const PHASE_ICON_MAP: Record<string, LucideIcon> = {
+  Search, Hammer, Tag, FileText, DollarSign, MapPin, Palette, Shield, Users, Settings,
+};
 
 export default function PhasePage() {
   const params = useParams();
@@ -30,17 +36,20 @@ export default function PhasePage() {
     );
   }
 
-  const color = PHASE_COLORS[num - 1];
+  const color = getPhaseColor(num);
+  const PhaseIconComp: LucideIcon = PHASE_ICON_MAP[phase.icon] ?? Search;
   const phaseSteps = checklistSteps.filter((s) => s.phase === num);
   const doneCnt = hydrated ? phaseSteps.filter((s) => completed.has(s.id)).length : 0;
 
-  const prevPhase = phases.find((p) => p.number === num - 1);
-  const nextPhase = phases.find((p) => p.number === num + 1);
+  // Find adjacent phases in display order
+  const phaseIdx = phases.findIndex((p) => p.number === num);
+  const prevPhase = phaseIdx > 0 ? phases[phaseIdx - 1] : null;
+  const nextPhase = phaseIdx < phases.length - 1 ? phases[phaseIdx + 1] : null;
 
   return (
     <div style={{ maxWidth: 680, display: "flex", flexDirection: "column", gap: 24 }}>
 
-      {/* ── Back ──────────────────────────────────────────── */}
+      {/* ── Back ──────────────────────────────────────────────── */}
       <Link href="/checklist" style={{
         display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
         fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600,
@@ -50,14 +59,19 @@ export default function PhasePage() {
         All phases
       </Link>
 
-      {/* ── Phase header ──────────────────────────────────── */}
+      {/* ── Phase header ──────────────────────────────────────── */}
       <div style={{ borderLeft: `4px solid ${color}`, paddingLeft: 20 }}>
-        <span style={{
-          fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em",
-          textTransform: "uppercase", color, display: "block", marginBottom: 4,
-        }}>
-          Phase {String(num).padStart(2, "0")}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+          <div style={{ width: 28, height: 28, background: color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <PhaseIconComp style={{ width: 14, height: 14, color: "white" }} />
+          </div>
+          <span style={{
+            fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em",
+            textTransform: "uppercase", color,
+          }}>
+            Phase {String(phaseIdx + 1).padStart(2, "0")}
+          </span>
+        </div>
         <h1 style={{
           fontFamily: "var(--font-display)", fontSize: "2.8rem", letterSpacing: "0.03em",
           color: "var(--navy)", lineHeight: 1, marginBottom: 10,
@@ -74,7 +88,7 @@ export default function PhasePage() {
         )}
       </div>
 
-      {/* ── Steps ─────────────────────────────────────────── */}
+      {/* ── Steps ─────────────────────────────────────────────── */}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {phaseSteps.map((step) => {
           const isDone = hydrated && completed.has(step.id);
@@ -88,11 +102,11 @@ export default function PhasePage() {
               <div
                 className="panel"
                 style={{
-                  display: "flex", alignItems: "center", gap: 16,
+                  display: "flex", alignItems: "center", gap: 14,
                   padding: "16px 20px",
                   borderLeft: `3px solid ${isDone ? color : "var(--border-light)"}`,
                   transition: "all 0.12s",
-                  opacity: isDone ? 0.7 : 1,
+                  opacity: isDone ? 0.72 : 1,
                 }}
                 onMouseEnter={e => {
                   (e.currentTarget as HTMLElement).style.borderLeftColor = color;
@@ -103,46 +117,53 @@ export default function PhasePage() {
                   (e.currentTarget as HTMLElement).style.transform = "";
                 }}
               >
-                {/* Step number */}
-                <span style={{
-                  fontFamily: "var(--font-display)", fontSize: "1.4rem",
-                  color: isDone ? color : "var(--border)", lineHeight: 1, minWidth: 36, flexShrink: 0,
+                {/* Phase icon (colored when done, muted when pending) */}
+                <div style={{
+                  width: 32, height: 32, flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: isDone ? `${color}15` : "var(--border-light)",
+                  border: `1.5px solid ${isDone ? color : "var(--border)"}`,
                 }}>
-                  {num}.{step.order}
-                </span>
+                  {isDone
+                    ? <CheckCircle2 style={{ width: 14, height: 14, color }} />
+                    : <PhaseIconComp style={{ width: 13, height: 13, color: "var(--ink-muted)" }} />
+                  }
+                </div>
 
-                {/* Text */}
+                {/* Step number + text */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{
-                    fontFamily: "var(--font-heading)", fontSize: "0.9rem", fontWeight: 700,
-                    color: isDone ? "var(--ink-muted)" : "var(--navy)", lineHeight: 1.3,
-                    marginBottom: 3,
-                    textDecoration: isDone ? "line-through" : "none",
-                  }}>
-                    {step.title}
-                  </p>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 2 }}>
+                    <span style={{
+                      fontFamily: "var(--font-display)", fontSize: "0.6rem",
+                      color: isDone ? color : "var(--border)", letterSpacing: "0.08em", flexShrink: 0,
+                    }}>
+                      {phaseIdx + 1}.{step.order}
+                    </span>
+                    <p style={{
+                      fontFamily: "var(--font-heading)", fontSize: "0.9rem", fontWeight: 700,
+                      color: isDone ? "var(--ink-muted)" : "var(--navy)", lineHeight: 1.3,
+                      textDecoration: isDone ? "line-through" : "none",
+                      margin: 0,
+                    }}>
+                      {step.title}
+                    </p>
+                  </div>
                   <p style={{
                     fontFamily: "var(--font-body)", fontSize: "0.78rem",
                     color: "var(--ink-muted)", lineHeight: 1.45, margin: 0,
                   }}>
-                    {step.description.slice(0, 100)}{step.description.length > 100 ? "…" : ""}
+                    {step.description.slice(0, 110)}{step.description.length > 110 ? "…" : ""}
                   </p>
                 </div>
 
-                {/* Status / arrow */}
-                <div style={{ flexShrink: 0 }}>
-                  {isDone
-                    ? <CheckCircle2 style={{ width: 16, height: 16, color }} />
-                    : <ChevronRight style={{ width: 16, height: 16, color: "var(--ink-muted)" }} />
-                  }
-                </div>
+                <ChevronRight style={{ width: 15, height: 15, color: isDone ? color : "var(--ink-muted)", flexShrink: 0, opacity: 0.6 }} />
               </div>
             </Link>
           );
         })}
       </div>
 
-      {/* ── Phase navigation ──────────────────────────────── */}
+      {/* ── Phase navigation ──────────────────────────────────── */}
       <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, gap: 12 }}>
         {prevPhase ? (
           <Link href={`/checklist/phase/${prevPhase.number}`} style={{
@@ -151,7 +172,7 @@ export default function PhasePage() {
             color: "var(--ink-muted)",
           }}>
             <ArrowLeft style={{ width: 13, height: 13 }} />
-            Phase {prevPhase.number}: {prevPhase.name}
+            {prevPhase.name}
           </Link>
         ) : <div />}
 
@@ -161,7 +182,7 @@ export default function PhasePage() {
             fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 600,
             color,
           }}>
-            Phase {nextPhase.number}: {nextPhase.name}
+            {nextPhase.name}
             <ArrowRight style={{ width: 13, height: 13 }} />
           </Link>
         ) : <div />}
