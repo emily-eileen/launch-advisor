@@ -31,7 +31,7 @@ export const phases: Phase[] = [
   { number: 3,  name: "Price",    icon: "Tag",        description: "Set your price with confidence from day one" },
   { number: 4,  name: "Form",     icon: "FileText",   description: "Make your business official and legally protected" },
   { number: 5,  name: "Finance",  icon: "DollarSign", description: "Build the financial foundation that compounds over time" },
-  { number: 6,  name: "Space",    icon: "MapPin",     description: "Set up where your business lives — online, offline, or both" },
+  { number: 6,  name: "Locate",   icon: "MapPin",     description: "Place your business — online, offline, or both" },
   { number: 7,  name: "Brand",    icon: "Palette",    description: "Build the identity that earns trust before anyone speaks to you" },
   { number: 8,  name: "Protect",  icon: "Shield",     description: "Prevent the five things that shut down businesses before year two" },
   { number: 9,  name: "Sell",     icon: "Users",      description: "Get your first paying customer this week" },
@@ -453,7 +453,7 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: "space-1",
     phase: 6,
-    phaseName: "Space",
+    phaseName: "Locate",
     order: 1,
     title: "Decide where your business will operate",
     description: "Home-based, online only, coworking, retail, or a combination — this decision drives your costs, your zoning requirements, and your customer experience. Most businesses start leaner than they think they need to.",
@@ -470,7 +470,7 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: "space-2",
     phase: 6,
-    phaseName: "Space",
+    phaseName: "Locate",
     order: 2,
     title: "Build your website or online storefront",
     description: "Your website is your most important business asset. For product businesses, your storefront IS your business. For service businesses, it is your first salesperson. Build something that clearly communicates who you help, what you do, and how to get started.",
@@ -492,7 +492,7 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: "space-3",
     phase: 6,
-    phaseName: "Space",
+    phaseName: "Locate",
     order: 3,
     title: "Get a virtual address",
     description: "Your home address becomes a public record the moment you file your LLC. A virtual mailbox gives you a real street address for your business, protects your privacy, and looks professional to clients and vendors.",
@@ -509,7 +509,7 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: "space-4",
     phase: 6,
-    phaseName: "Space",
+    phaseName: "Locate",
     order: 4,
     title: "Set up your physical workspace",
     description: "Whether you work from home, a coworking space, or a shared studio — set up a dedicated workspace that is separate from your personal life. This protects your home office tax deduction and trains your brain to switch into work mode.",
@@ -525,7 +525,7 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: "space-5",
     phase: 6,
-    phaseName: "Space",
+    phaseName: "Locate",
     order: 5,
     title: "Find and negotiate commercial or retail space",
     description: "If your business requires a physical location — retail, restaurant, studio, warehouse — this is the most expensive commitment you will make. Read every clause. Never sign without understanding CAM charges, personal guarantee scope, and your exit options.",
