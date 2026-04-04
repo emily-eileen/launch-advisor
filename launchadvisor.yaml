@@ -1,0 +1,504 @@
+# =============================================================================
+# LaunchAdvisor Company Profile — MeetMyCMO Platform
+# =============================================================================
+# LaunchAdvisor is a free launch checklist and guide platform for anyone
+# starting a business for the first time — from pre-idea to first $50K in
+# revenue. Deliberately broad: targets the 20 most common new business types
+# by NAICS formation volume plus the long tail of micro-businesses, gig-to-
+# business transitions, and side-hustle formalization.
+#
+# Revenue range: pre-revenue to ~$150K. Below the floor of executive advisory.
+# Above it, MeetMyCXO takes over.
+#
+# Widest possible net: teenagers starting lawn care, parents opening daycares,
+# laid-off workers going freelance, retirees buying a franchise, tradespeople
+# quitting their employer, anyone who has never formed a business before.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# PLATFORM-REQUIRED SECTIONS
+# -----------------------------------------------------------------------------
+
+company:
+  name: "LaunchAdvisor"
+  slug: "launchadvisor"
+  primary_website_url: "https://launchadvisor.co"
+
+brand_voice:
+  tone_adjectives:
+    - practical and direct
+    - encouraging without being cheerleader-ish
+    - founder-to-founder — peer energy, not guru energy
+    - plain language over jargon
+    - specific and concrete — numbers, steps, decisions
+    - honest about what is hard
+    - calm under uncertainty
+    - never patronizing
+    - never hype-driven
+    - confident but not arrogant
+  do_list:
+    - lead with the decision, not the setup
+    - name the exact step, tool, or form required
+    - speak to one specific type of founder ("if you're starting a food truck...")
+    - use specific numbers — costs, timelines, permit fees, conversion rates
+    - acknowledge the gap between what looks easy and what is actually hard
+    - show failure cases before success — "here's where most people stall" builds trust
+    - contrast what new founders assume vs what actually matters in week one
+    - use direct imperatives — "file your LLC before you sign your first lease" beats "you should consider filing"
+    - end with a single clear next action
+    - reference real business types and real scenarios, not abstract "startups"
+  dont_list:
+    - use motivational filler ("you've got this!", "believe in yourself")
+    - use em dashes
+    - end bullets with periods
+    - address a crowd (no "hey everyone," "founders!")
+    - use hype words (crush it, kill it, game-changing, revolutionary)
+    - use salesy CTAs (sign up now, don't miss out, limited time)
+    - give advice so generic it applies to nothing specific
+    - lead with disclaimers before giving the actual answer
+    - talk down to beginners — assume intelligence, not prior knowledge
+    - pad content to seem thorough — cut to what actually matters
+  contraction_preference: "always"
+  reading_level: "conversational — 8th grade target"
+  banned_phrases:
+    - "Here's what most people miss"
+    - "Most founders get this wrong"
+    - "The truth is"
+    - "Here's the thing"
+    - "At the end of the day"
+    - "Let me walk you through"
+    - "It's easier than you think"
+    - "Just follow these simple steps"
+    - "This will change everything"
+    - "The secret to"
+    - "What nobody tells you"
+  jargon_blacklist:
+    - leverage  # use "use" or "take advantage of"
+    - utilize
+    - synergy
+    - value proposition  # say "why customers choose you"
+    - scalable
+    - ecosystem
+    - best-in-class
+    - disruptive
+    - ideate
+    - pivot  # say "change direction" or name the specific change
+    - bootstrapped  # fine in context; avoid as jargon shorthand
+  filler_blacklist:
+    - "In today's competitive landscape"
+    - "As an entrepreneur"
+    - "On your journey"
+    - "The entrepreneurial journey"
+    - "Dream big"
+  throat_clearing_blacklist:
+    - "Before we dive in"
+    - "In this guide I'll cover"
+    - "Welcome to"
+    - "This checklist will help you"
+    - "Let me explain"
+    - "I want to tell you"
+    - "You need to understand"
+    - "It's important to note"
+  filler_word_watchlist:
+    - just
+    - very
+    - really
+    - actually
+    - basically
+    - simply
+    - quite
+    - honestly
+    - literally
+  sentence_starter_variety_rules:
+    - "Do not start with Because, Since, While, Although, As"
+
+audience_positioning:
+  # Top 20 NAICS codes by new business formation volume — 2026
+  # Plus the long tail of micro-businesses and gig-to-business transitions
+  # Source: Census Bureau Business Formation Statistics + IRS EIN filings
+  revenue_range: "pre-revenue to ~$500K — launch through early growth"
+
+  target_naics:
+    # ── High-volume professional services ─────────────────────────────────────
+    - code: "541611"
+      label: "Consulting (Any Type)"
+      description: "Business consultants, life coaches, HR consultants, strategy advisors — anyone selling their expertise by the hour or project"
+    - code: "541512"
+      label: "Freelance Tech / IT Services"
+      description: "Solo developers, IT support, Upwork freelancers, AI prompt engineers, web designers"
+    - code: "711510"
+      label: "Freelancer / Independent Creator"
+      description: "Writers, social media managers, graphic designers, photographers, video editors — any skill sold independently"
+    - code: "611699"
+      label: "Coaching & Online Education"
+      description: "Life coaches, business coaches, tutors, online course sellers, skills instructors — any knowledge monetization"
+    - code: "541810"
+      label: "Marketing Freelancer / Micro Agency"
+      description: "Solo social media managers, copywriters, SEO freelancers, one-person marketing shops"
+    - code: "541922"
+      label: "Photography & Videography"
+      description: "Wedding and event photographers, content creators selling their lens work, real estate photographers"
+    # ── Trades and home services ──────────────────────────────────────────────
+    - code: "236118"
+      label: "Home Services & Handyman"
+      description: "Handyman, general contractors, remodelers, painters, HVAC, electricians going independent for the first time"
+    - code: "238990"
+      label: "Specialty Trade (Solo)"
+      description: "First-time self-employed tradespeople: roofers, plumbers, flooring, tile, drywall — leaving an employer to work for themselves"
+    - code: "561720"
+      label: "Cleaning Business"
+      description: "Residential house cleaning, Airbnb turnover cleaning, commercial cleaning — one of the most-filed new business types in the US"
+    - code: "561730"
+      label: "Lawn Care & Landscaping"
+      description: "Solo lawn mowing, leaf blowing, snow removal, basic landscaping — often a first business for teenagers and young adults"
+    - code: "561790"
+      label: "Other Home & Property Services"
+      description: "Window washing, pressure washing, gutter cleaning, junk removal, mobile car detailing"
+    # ── Food and hospitality ──────────────────────────────────────────────────
+    - code: "722330"
+      label: "Food Truck / Pop-Up Food Business"
+      description: "First food truck, farmers market booth, ghost kitchen launch, pop-up restaurant — pre-brick-and-mortar food"
+    - code: "722515"
+      label: "Snack Bar / Concession / Catering (Solo)"
+      description: "Catering out of a home kitchen, event catering startups, single-operator concession businesses"
+    - code: "531110"
+      label: "Airbnb / Short-Term Rental (First Property)"
+      description: "First-time Airbnb hosts, VRBO listers, someone converting a spare bedroom or vacation property into income"
+    # ── Retail and e-commerce ─────────────────────────────────────────────────
+    - code: "454110"
+      label: "E-Commerce & Online Selling"
+      description: "First Shopify store, Etsy seller going legit, Amazon reseller, Facebook Marketplace to real business transition"
+    - code: "453998"
+      label: "Specialty Retail / Pop-Up Shop"
+      description: "Craft sellers, resellers, consignment shops, flea market vendors, boutique pop-ups — any first physical or hybrid retail"
+    # ── Personal care and wellness ────────────────────────────────────────────
+    - code: "812112"
+      label: "Hair / Nail / Beauty (Solo)"
+      description: "Solo stylists renting a chair, nail techs going independent, estheticians starting out of a home studio"
+    - code: "812910"
+      label: "Pet Services (Solo)"
+      description: "Solo dog walkers, pet sitters (Rover, Wag transitioning to independent), mobile groomers — very common first business"
+    - code: "713940"
+      label: "Fitness & Personal Training"
+      description: "Solo personal trainers, yoga instructors, Pilates teachers going independent — often first business after a certification"
+    # ── Childcare and personal services ──────────────────────────────────────
+    - code: "624410"
+      label: "Childcare / Babysitting / Nanny Business"
+      description: "Home daycares, babysitting businesses, nanny placement — one of the most common micro-businesses for parents and young adults"
+    - code: "812990"
+      label: "Personal Errands & Concierge Services"
+      description: "Errand runners, personal shoppers, TaskRabbit operators going independent, senior companion services"
+    # ── High-Growth Graduation Paths (Fintastiq / MeetMyCXO pipeline) ─────────
+    - code: "513210"
+      label: "Software Publishers / SaaS"
+      description: "B2B or B2C SaaS platforms, mobile application publishers, enterprise software startups"
+    - code: "531210"
+      label: "Real Estate Agencies & Brokerages"
+      description: "Independent real estate agents graduating to owning their own B2B brokerage and firm"
+    - code: "484121"
+      label: "Logistics / Freight / Independent Trucking"
+      description: "Owner-operators starting an independent logistics or long-haul trucking business"
+    - code: "621399"
+      label: "Private Healthcare / MedSpa Practices"
+      description: "Nurse practitioners, functional medicine doctors, physical therapists opening private boutique practices"
+
+  # LaunchAdvisor is TOP OF FUNNEL for MeetMyCXO.
+  # Same 20 business types — earlier stage. At ~$500K revenue, operators
+  # graduate to MeetMyCXO for exec-function advisory.
+  funnel_position: "top-of-funnel — pre-revenue to ~$500K"
+  handoff_to: "meetmycxo — at ~$500K revenue, when B2B complexity or team size demands exec-function thinking"
+
+  icps:
+    - label: "Complete Beginner (Pre-Formation)"
+      description: "Has an idea or a skill but hasn't filed anything, made a dollar, or told anyone. Paralyzed by not knowing what to do first. Could be any age, any business type."
+    - label: "Side Hustle → Going Legit"
+      description: "Already making money informally — on Venmo, through word of mouth, under the table. Needs to form an entity, open a business account, and get insured before something goes wrong."
+    - label: "Tradesperson or Laborer Going Independent"
+      description: "Skilled in their trade, zero experience with business formation. Cleaning, landscaping, construction, handyman. Leaving an employer or quitting a gig app to work directly for clients."
+    - label: "First-Time Food or Hospitality Operator"
+      description: "Opening a food truck, pop-up, home bakery, or ghost kitchen. Has the recipe and the ambition but no licenses, no entity, no point-of-sale, and no idea what the health department requires."
+    - label: "First Airbnb or STR Host"
+      description: "Listing their first property or spare bedroom. Has never run a business. Doesn't know about STR regulations, insurance, entity setup, or how to handle taxes on rental income."
+    - label: "E-Commerce or Etsy Seller Going Serious"
+      description: "Making sales but not running it like a business. No LLC, personal PayPal for payments, no tracking of COGS or inventory. Wants to do it right before it gets complicated."
+    - label: "Young Entrepreneur (Teen or Early 20s)"
+      description: "Lawn care, dog walking, babysitting, car detailing, social media management — starting very small, very young. Needs the basics in plain language with no assumed prior knowledge."
+    - label: "Career Transitioner / Laid-Off Worker"
+      description: "Lost a job or exited a career and is going out on their own for the first time. Smart and capable but new to business ownership. High urgency, limited time to figure it out."
+
+  pain_points:
+    # Pre-formation
+    - "Don't know what to do first — Google gives 50 different answers"
+    - "Don't know whether to form an LLC, S-Corp, or sole prop — afraid of making a costly mistake"
+    - "Unsure which licenses and permits apply to their specific business type and city"
+    # Early operations
+    - "No idea how to price their service or product for the first time"
+    - "Building a brand from scratch with no design skills and no budget"
+    - "Finding first customers before they have reviews, a website, or a track record"
+    - "Can't tell which tools they actually need vs which ones are just popular"
+    # Money and compliance
+    - "Terrified of taxes — don't understand quarterly estimated payments, deductions, or entity-level taxes"
+    - "Underestimating startup costs — run out of runway before their first profitable month"
+    - "Mixing personal and business finances — using the same bank account for everything"
+    # Execution
+    - "Delayed or paralyzed by perfectionism — overplanning instead of launching"
+    - "Don't understand what their first 30 days should actually look like operationally"
+    - "Overwhelmed by how much there is to do and don't know what order to do it in"
+
+  differentiators:
+    - "Organized into a 10-phase checklist that mirrors the actual launch sequence — not alphabetical or generic"
+    - "Built for specific business types, not just generic 'startups'"
+    - "Comparison guides on every key tool and decision point so founders choose with confidence"
+    - "Free — no paywall, no upsell on the core checklist"
+    - "Cross-linked between steps and guides so every action connects to why it matters"
+
+  category_keywords:
+    - how to start a business
+    - business launch checklist
+    - LLC vs sole proprietor
+    - how to register a business
+    - how to get an EIN
+    - how to open a business bank account
+    - how to get your first customer
+    - small business startup steps
+    - how to start a food truck
+    - how to start a cleaning business
+    - how to start a lawn care business
+    - how to start a dog walking business
+    - how to start a home daycare
+    - Airbnb host checklist
+    - how to become an Airbnb host
+    - e-commerce launch guide
+    - how to sell on Etsy
+    - freelance business setup
+    - how to start a handyman business
+    - how to start a photography business
+    - how to become a personal trainer
+
+content_strategy_defaults:
+  channels_enabled:
+    - LinkedIn
+    - TikTok
+    - Instagram
+    - Pinterest
+    - YouTube
+    - X
+  content_types_enabled:
+    - short_form_video
+    - medium_form_video
+    - long_form_written
+    - short_form_text
+  cadence_tiers:
+    light:
+      pieces_per_week: 3
+    standard:
+      pieces_per_week: 5
+    aggressive:
+      pieces_per_week: 7
+  default_cadence_tier: "standard"
+  default_cta_patterns:
+    - name: "Open the free launch checklist"
+      funnel_stage: "TOFU"
+      url: "https://launchadvisor.co/checklist"
+    - name: "Read the full guide"
+      funnel_stage: "MOFU"
+      url: "https://launchadvisor.co/guides"
+    - name: "Take the quiz — find your launch phase"
+      funnel_stage: "TOFU"
+      url: "https://launchadvisor.co/quiz"
+    - name: "Get my personalized launch plan"
+      funnel_stage: "BOFU"
+      url: "https://launchadvisor.co/checklist"
+
+compliance:
+  regulated_claims_rules:
+    - "Do not provide specific legal advice — always recommend consulting a licensed attorney for entity selection, contracts, or IP"
+    - "Do not provide specific tax advice — always recommend consulting a CPA or enrolled agent for tax strategy"
+    - "Do not imply guaranteed income or revenue outcomes from following the checklist"
+  disclaimers_required:
+    - "LaunchAdvisor is for educational purposes only and does not constitute legal, financial, or tax advice."
+  topics_to_avoid:
+    - specific investment advice
+    - specific legal strategy for individual situations
+    - medical or health claims
+
+inspiration_sources:
+  allowed_reference_domains:
+    - sba.gov
+    - irs.gov
+    - score.org
+    - nolo.com
+    - investopedia.com
+    - hbr.org
+    - entrepreneur.com
+    - inc.com
+  competitor_list:
+    - "Starter Story"
+    - "Shopify Blog"
+    - "NerdWallet Small Business"
+    - "SCORE mentors content"
+    - "Bplans.com"
+  ground_truth: null
+
+integrations:
+  storage:
+    local:
+      enabled: true
+  media_generation:
+    heygen:
+      enabled: false
+  publishing:
+    manual:
+      enabled: true
+      provider: "manual"
+    linkedin:
+      enabled: false
+    tiktok:
+      enabled: false
+    instagram:
+      enabled: false
+    pinterest:
+      enabled: false
+    x:
+      enabled: false
+    youtube:
+      enabled: false
+  web_search:
+    enabled: true
+    provider: "tavily"
+    credential_env_var: "TAVILY_API_KEY"
+  notifications:
+    enabled: false
+    provider: null
+
+# --- Feature Flags ---
+executive_reporting: false
+trend_alert_threshold: 3
+community_engagement: false
+
+# --- Approval Workflow ---
+approvals:
+  enabled: false
+  mode: "email_reply_only"
+  approvers: []
+  require_all_approvers: false
+  token_expiry_hours: 72
+  auto_publish_if_no_response_hours: 0
+  max_revision_cycles: 2
+
+# =============================================================================
+# BRAND / CONTENT ENGINE SECTIONS
+# =============================================================================
+
+business:
+  name: "LaunchAdvisor"
+  spoken_name: "launch advisor"
+  tagline: "Every step. Before you need it."
+  domain: "small business launch — formation, brand, first sales, operations"
+  canonical_anchor_line: "Most businesses don't fail because the idea was bad. They fail because nobody told the founder what to do in the right order."
+
+audience:
+  primary: "anyone starting their first business — pre-revenue through ~$500K across all 20 business types"
+  secondary: "side-hustle operators formalizing, gig workers going independent, and tradespeople leaving employers"
+  traits:
+    - smart but new to business formation
+    - research-oriented — they Google everything
+    - overwhelmed by the number of things to do
+    - don't know what they don't know
+    - decision-fatigued by too many tool options
+    - short on time — usually doing this alongside a job
+  transformation: "go from 'I have an idea' to a legally formed, branded, and revenue-generating business in the right sequence"
+  voice_target: "talk to someone who just said 'okay I'm doing this — what do I actually do first?' — specific, calm, no fluff"
+
+stances:
+  core:
+    - "Sequence is the most underrated part of starting a business"
+    - "Most founders are delayed by questions that have a single right answer — they just don't know it yet"
+    - "An LLC is not a strategy — it's a step"
+    - "Your brand doesn't need to be perfect before you get your first customer"
+    - "The best tool is the one you'll actually use, not the one with the most features"
+    - "Perfectionism is procrastination with a better story"
+    - "Your first customer matters more than your logo"
+    - "Most permits take longer than you expect — start that process on day one"
+    - "Undercapitalization is the most predictable startup killer"
+    - "You don't need a business plan — you need a launch plan"
+  rules:
+    - reinforce existing stances before introducing new ones
+    - avoid contradicting past positions without explicit reframing
+    - always ground advice in the specific business type when possible — generic advice is the enemy of trust
+
+funnel_assets:
+  tofu:
+    - name: "Free launch checklist"
+      url: "https://launchadvisor.co/checklist"
+    - name: "Launch phase quiz"
+      url: "https://launchadvisor.co/quiz"
+    - name: "Business type comparison guides"
+      url: "https://launchadvisor.co/guides"
+  mofu:
+    - name: "Phase-by-phase guide library"
+      url: "https://launchadvisor.co/guides"
+    - name: "Resources directory"
+      url: "https://launchadvisor.co/resources"
+  bofu:
+    - name: "Save my progress (email capture)"
+      url: "https://launchadvisor.co/checklist"
+
+cadence:
+  schedule:
+    monday:
+      theme: "Business Type Spotlight"
+      focus:
+        - pick one of the 18 target business types
+        - walk through the single most common mistake founders in that category make in phase 1-3
+    tuesday:
+      theme: "Tool or Decision Comparison"
+      focus:
+        - LLC vs S-Corp, Canva vs Figma, Stripe vs Square, Wix vs Shopify
+        - comparison-format — specific, opinionated, no hedging
+    wednesday:
+      theme: "Step-by-Step Process"
+      focus:
+        - how to get an EIN, how to open a business bank account, how to file a DBA
+        - single-action walkthroughs
+    thursday:
+      theme: "First Customer / First Revenue"
+      focus:
+        - pre-sales, outreach, pricing the first offer, finding the first 10 customers
+    friday:
+      theme: "Founder Case Study or Story"
+      focus:
+        - real founder, specific business type, specific phase, what worked and what didn't
+    saturday:
+      theme: "Quick Win Saturday"
+      focus:
+        - one thing a founder can do in under 30 minutes today to move forward
+    sunday:
+      theme: "Big Picture"
+      focus:
+        - the full arc of starting a business — sequence, capital, risk, timing
+  short_form_days:
+    - monday
+    - tuesday
+    - wednesday
+    - thursday
+  medium_form_days:
+    - saturday
+  long_form_days:
+    - sunday
+  written_days:
+    - friday
+  weekly_mix:
+    min_tofu: 2
+    min_mofu: 2
+    min_bofu: 1
+  hook_rotation:
+    rule: "No two posts in the same week should use the same hook type"
+    types:
+      - stat_based
+      - diagnostic
+      - direct_challenge
+      - ironic_contrast
+      - contrarian
+      - gut_punch
+      - scenario_specific  # "If you're starting a food truck in Texas..."

@@ -12,8 +12,18 @@ const PHASE_COLORS: Record<number, string> = {
 };
 
 export async function generateStaticParams() {
-  const guides = await getAllGuides();
-  return guides.map((g) => ({ slug: g.slug }));
+  const genericGuides = await getAllGuides();
+  let tailoredGuides: Guide[] = [];
+  try {
+    const tailoredMod = await import('@/lib/data/guides/index');
+    tailoredGuides = await tailoredMod.getAllTailoredGuides();
+  } catch (e) {
+    // If tailored guides don't exist yet
+  }
+  
+  const allCurrentSlugs = [...genericGuides, ...tailoredGuides];
+  
+  return allCurrentSlugs.map((g) => ({ slug: g.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

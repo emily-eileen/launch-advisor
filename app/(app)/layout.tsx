@@ -26,7 +26,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser]             = useState<{ email?: string; id?: string } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [bizMenuOpen, setBizMenuOpen] = useState(false);
-  const [activeBiz, setActiveBiz]   = useState(MOCK_BUSINESSES[0]);
+  const [activeBiz, setActiveBiz]   = useState<any>({ id: "local", name: "My Project", type: "Unknown" });
+  const [workspaces, setWorkspaces] = useState<any[]>([]);
   const [completed, setCompleted]   = useState<Set<string>>(new Set());
   const [loading, setLoading]       = useState(true);
   const router   = useRouter();
@@ -44,23 +45,96 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const activePhase = currentStep?.phase ?? null;
 
   useEffect(() => {
-    // Load progress from localStorage
-    const saved = localStorage.getItem("launchadvisor_progress");
-    if (saved) setCompleted(new Set(JSON.parse(saved)));
-
-    async function getUser() {
+    async function initUserAndWorkspace() {
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user && !isPublicPath) { router.push("/login"); return; }
-        setUser(user ? { email: user.email, id: user.id } : null);
-      } catch {
-        setUser(null);
+
+        if (!user) {
+          if (!isPublicPath) { router.push("/login"); return; }
+          // Fallback to local storage for unauthenticated users
+          const savedProg = localStorage.getItem("launchadvisor_progress");
+          if (savedProg) setCompleted(new Set(JSON.parse(savedProg)));
+          const savedName = localStorage.getItem("launchadvisor_project_name") || "My Project";
+          setActiveBiz({ id: "local", name: savedName, type: "Local Workspace" });
+          return;
+        }
+
+        setUser({ email: user.email, id: user.id });
+
+        // Fetch workspaces from Supabase
+        const { data: dbWorkspaces } = await supabase
+          .from("workspaces")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+
+        let loadedWorkspaces = dbWorkspaces || [];
+
+        // If Cloud is empty but Local Storage has a project, migrate it upward!
+        const localQuiz = localStorage.getItem("launchadvisor_quiz");
+        const localProjectName = localStorage.getItem("launchadvisor_project_name") || "My Project";
+        if (loadedWorkspaces.length === 0 && localQuiz) {
+           let quizData: any = {};
+           try { quizData = JSON.parse(localQuiz); } catch(e) {}
+           
+           const { data: newWs } = await supabase.from("workspaces").insert({
+               user_id: user.id,
+               project_name: localProjectName,
+               business_type: quizData.businessType || 'unknown',
+               stage: quizData.stage || 'unknown'
+           }).select().single();
+
+           if (newWs) {
+               loadedWorkspaces = [newWs];
+               // Sync any local progress upward
+               const localProgress = localStorage.getItem("launchadvisor_progress");
+               if (localProgress) {
+                   const progressSet = JSON.parse(localProgress);
+                   const inserts = progressSet.map((stepId: string) => ({
+                       workspace_id: newWs.id,
+                       step_id: stepId,
+                       is_done: true
+                   }));
+                   if (inserts.length > 0) {
+                     await supabase.from("workspace_progress").insert(inserts);
+                   }
+               }
+           }
+        }
+
+        if (loadedWorkspaces.length > 0) {
+            setWorkspaces(loadedWorkspaces);
+            
+            // Set active workspace
+            const activeId = localStorage.getItem("launchadvisor_active_workspace") || loadedWorkspaces[0].id;
+            const active = loadedWorkspaces.find((w: any) => w.id === activeId) || loadedWorkspaces[0];
+            setActiveBiz({ id: active.id, name: active.project_name, type: active.business_type });
+            localStorage.setItem("launchadvisor_active_workspace", active.id);
+
+            // Hydrate progress from Supabase downward
+            const { data: progress } = await supabase
+                .from("workspace_progress")
+                .select("step_id")
+                .eq("workspace_id", active.id)
+                .eq("is_done", true);
+            
+            if (progress) {
+                const stepIds = progress.map((p: any) => p.step_id);
+                setCompleted(new Set(stepIds));
+                localStorage.setItem("launchadvisor_progress", JSON.stringify(stepIds));
+            }
+        } else {
+            setActiveBiz({ id: "local", name: "My Project", type: "N/A" });
+        }
+      } catch (err) {
+        console.warn("Failed to sync workspace state", err);
       } finally {
         setLoading(false);
       }
     }
-    getUser();
+
+    initUserAndWorkspace();
   }, [router, isPublicPath]);
 
   async function handleSignOut() {
@@ -136,12 +210,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             {bizMenuOpen && (
               <div style={{ position: "absolute", left: 10, right: 10, top: "100%", background: "var(--surface)", border: "2px solid var(--border)", zIndex: 100, boxShadow: "4px 4px 0 var(--border)" }}>
-                {MOCK_BUSINESSES.map(biz => (
-                  <button key={biz.id} onClick={() => { setActiveBiz(biz); setBizMenuOpen(false); }}
+                {workspaces.map((biz) => (
+                  <button key={biz.id} onClick={() => { 
+                      setActiveBiz({ id: biz.id, name: biz.project_name, type: biz.business_type }); 
+                      localStorage.setItem("launchadvisor_active_workspace", biz.id);
+                      setBizMenuOpen(false); 
+                      window.location.reload(); // Refresh to sync active workspace progress
+                    }}
                     style={{ width: "100%", padding: "10px 14px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid var(--border-light)", background: activeBiz.id === biz.id ? "var(--orange-light)" : "transparent", cursor: "pointer" }}>
                     <div style={{ flex: 1, textAlign: "left" }}>
-                      <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.8rem", fontWeight: 700, color: "var(--navy)" }}>{biz.name}</p>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", color: "var(--ink-muted)" }}>{biz.type}</p>
+                      <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.8rem", fontWeight: 700, color: "var(--navy)" }}>{biz.project_name}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", color: "var(--ink-muted)" }}>{biz.business_type}</p>
                     </div>
                     {activeBiz.id === biz.id && <div style={{ width: 6, height: 6, background: "var(--orange)" }} />}
                   </button>

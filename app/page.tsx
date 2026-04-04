@@ -4,16 +4,16 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, Zap, Shield, BookOpen, TrendingUp, Star } from "lucide-react";
 
 const PHASES = [
-  { num: "01", name: "Validate",  color: "#F97316", desc: "Prove your idea before spending a dollar. Talk to customers, run demand tests, define your niche." },
-  { num: "02", name: "Build",     color: "#8B5CF6", desc: "Create your MVP — product, service, or storefront. Ship the minimum that earns the first dollar." },
-  { num: "03", name: "Price",     color: "#16A34A", desc: "Set pricing that covers costs and signals value. Model your unit economics from day one." },
-  { num: "04", name: "Form",      color: "#0EA5E9", desc: "Register your entity, get your EIN, open your bank account, set up payroll." },
-  { num: "05", name: "Finance",   color: "#EF4444", desc: "Get funded, set up bookkeeping, and build the financial systems to stay solvent." },
-  { num: "06", name: "Locate",    color: "#F59E0B", desc: "Find your space — storefront, virtual office, or home-based setup. Set up your address and ops stack." },
-  { num: "07", name: "Brand",     color: "#EC4899", desc: "Name, logo, website, social presence. Build the identity that earns trust on first contact." },
-  { num: "08", name: "Protect",   color: "#06B6D4", desc: "Business insurance, contracts, IP, and compliance. Cover the bases that sink unprepared founders." },
-  { num: "09", name: "Sell",      color: "#A855F7", desc: "Build your sales system — CRM, pipeline, outreach, and your first repeatable acquisition channel." },
-  { num: "10", name: "Operate",   color: "#14B8A6", desc: "Set up team, tools, SOPs, and reporting. Run like a real business from the first week." },
+  { num: "01", phaseId: 1,  name: "Validate", color: "#F97316", desc: "Prove your idea before spending a dollar. Talk to customers, run demand tests, define your niche." },
+  { num: "02", phaseId: 4,  name: "Form",     color: "#8B5CF6", desc: "Register your entity, get your EIN, open your bank account, set up payroll." },
+  { num: "03", phaseId: 5,  name: "Finance",  color: "#16A34A", desc: "Get funded, set up bookkeeping, and build the financial systems to stay solvent." },
+  { num: "04", phaseId: 2,  name: "Build",    color: "#0EA5E9", desc: "Create your MVP — product, service, or storefront. Ship the minimum that earns the first dollar." },
+  { num: "05", phaseId: 7,  name: "Brand",    color: "#EF4444", desc: "Name, logo, website, social presence. Build the identity that earns trust on first contact." },
+  { num: "06", phaseId: 8,  name: "Protect",  color: "#F59E0B", desc: "Business insurance, contracts, IP, and compliance. Cover the bases that sink unprepared founders." },
+  { num: "07", phaseId: 6,  name: "Locate",   color: "#EC4899", desc: "Find your space — storefront, virtual office, or home-based setup. Set up your address and ops stack." },
+  { num: "08", phaseId: 3,  name: "Price",    color: "#06B6D4", desc: "Set pricing that covers costs and signals value. Model your unit economics from day one." },
+  { num: "09", phaseId: 9,  name: "Sell",     color: "#A855F7", desc: "Build your sales system — CRM, pipeline, outreach, and your first repeatable acquisition channel." },
+  { num: "10", phaseId: 10, name: "Operate",  color: "#14B8A6", desc: "Set up team, tools, SOPs, and reporting. Run like a real business from the first week." },
 ];
 
 const TESTIMONIALS = [
@@ -31,9 +31,26 @@ const STATS = [
 
 const GUIDE_TOPICS = [
   { phase: "Validate", color: "#F97316", guides: ["How to Validate a Business Idea", "Market Research on a Shoestring", "Lean MVP Testing Methods"] },
-  { phase: "Form",     color: "#0EA5E9", guides: ["LLC vs S-Corp: Which Is Right for You?", "How to Get an EIN in 10 Minutes", "Opening a Business Bank Account"] },
-  { phase: "Finance",  color: "#EF4444", guides: ["Best Business Credit Cards for Startups", "Small Business Bookkeeping Setup", "How to Apply for an SBA Loan"] },
-  { phase: "Brand",    color: "#EC4899", guides: ["Building a Brand Identity on a Budget", "How to Register a Domain Name", "The Website Launch Checklist"] },
+  { phase: "Form",     color: "#8B5CF6", guides: ["LLC vs S-Corp: Which Is Right for You?", "How to Get an EIN in 10 Minutes", "Opening a Business Bank Account"] },
+  { phase: "Finance",  color: "#16A34A", guides: ["Best Business Credit Cards for Startups", "Small Business Bookkeeping Setup", "How to Apply for an SBA Loan"] },
+  { phase: "Brand",    color: "#EF4444", guides: ["Building a Brand Identity on a Budget", "How to Register a Domain Name", "The Website Launch Checklist"] },
+];
+
+const BUSINESS_CATEGORIES = [
+  { value: "consulting",      label: "Consulting / Coaching" },
+  { value: "tech",            label: "Tech / IT / App" },
+  { value: "creative",        label: "Creative Services" },
+  { value: "home-services",   label: "Home / Property Service" },
+  { value: "trades",          label: "Trades / Construction" },
+  { value: "food",            label: "Food & Beverage" },
+  { value: "str",             label: "Airbnb / Rental" },
+  { value: "ecommerce",       label: "E-Commerce / Retail" },
+  { value: "beauty-wellness", label: "Beauty / Wellness" },
+  { value: "care-services",   label: "Care / Personal Services" },
+  { value: "saas",            label: "Software Publishers / SaaS" },
+  { value: "real-estate",     label: "Real Estate Agencies / Brokerages" },
+  { value: "logistics",       label: "Logistics / Trucking Fleet" },
+  { value: "medspa",          label: "Private Healthcare / MedSpa" },
 ];
 
 export default function LandingPage() {
@@ -78,7 +95,7 @@ export default function LandingPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
               <div style={{ height: 1, width: 40, background: "var(--orange)" }} />
               <span style={{ fontFamily: "var(--font-display)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
-                Zero to launch — the complete OS
+                The Executive Copilot For New Founders
               </span>
             </div>
 
@@ -88,8 +105,8 @@ export default function LandingPage() {
               <span style={{ fontSize: "0.65em" }}>START LAUNCHING.</span>
             </h1>
 
-            <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.6)", fontSize: "1.1rem", lineHeight: 1.7, marginBottom: 36, maxWidth: 460 }}>
-              The exact 55-step playbook to go from idea to open for business — 10 phases, every tool curated, zero guesswork.
+            <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.6)", fontSize: "1.05rem", lineHeight: 1.7, marginBottom: 36, maxWidth: 500 }}>
+              Don't guess how to start your business. Follow the exact 10-step industry process to form, build, and launch your business with confidence — zero to first revenue.
             </p>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginBottom: 36 }}>
@@ -118,52 +135,15 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Right — checklist preview */}
-          <div style={{ position: "relative" }}>
-            <div className="panel" style={{ background: "var(--surface)", boxShadow: "6px 6px 0 var(--orange)", border: "2px solid var(--border)" }}>
-              <div style={{ borderBottom: "2px solid var(--border)", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--surface-warm)" }}>
-                <div>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.25em", color: "var(--ink-muted)", textTransform: "uppercase" }}>Your launch checklist</p>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", letterSpacing: "0.03em", color: "var(--navy)", lineHeight: 1.2 }}>PHASE 1 — VALIDATE</p>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "var(--orange)" }}>4/5</span>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", color: "var(--ink-muted)" }}>steps done</p>
-                </div>
-              </div>
-
-              {[
-                { n: "01", t: "Define your core idea", done: true },
-                { n: "02", t: "Research target market", done: true },
-                { n: "03", t: "Choose business model", done: true },
-                { n: "04", t: "Validate with real people", done: true },
-                { n: "05", t: "Set your launch budget", done: false, active: true },
-              ].map((s) => (
-                <div key={s.n} style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 20px", borderBottom: "1px solid var(--border-light)", background: s.active ? "var(--orange-light)" : "transparent" }}>
-                  <div className={`step-checkbox ${s.done ? "checked" : ""}`}>
-                    {s.done && <CheckCircle2 style={{ width: 13, height: 13, color: "white" }} />}
-                  </div>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: "0.85rem", color: "var(--ink-muted)", minWidth: 28 }}>{s.n}</span>
-                  <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", flex: 1, fontWeight: s.active ? 700 : 400, color: s.done ? "var(--ink-muted)" : s.active ? "var(--navy)" : "var(--ink)", textDecoration: s.done ? "line-through" : "none" }}>
-                    {s.t}
-                  </span>
-                  {s.active && <ArrowRight style={{ width: 16, height: 16, color: "var(--orange)", flexShrink: 0 }} />}
-                </div>
-              ))}
-
-              <div style={{ padding: "14px 20px", background: "var(--surface-warm)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Phase progress</span>
-                  <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 700, color: "var(--orange)" }}>80%</span>
-                </div>
-                <div className="progress-track">
-                  <div className="progress-fill" style={{ width: "80%" }} />
-                </div>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: -16, right: -16, background: "var(--orange)", border: "2px solid var(--navy)", padding: "6px 14px", boxShadow: "3px 3px 0 var(--navy)" }}>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: "0.75rem", letterSpacing: "0.12em", color: "white" }}>FREE TO START</p>
+          {/* Right — Hero Image */}
+          <div style={{ position: "relative", transform: "rotate(2deg)" }}>
+            <img 
+              src="/hero-image.png" 
+              alt="Take your startup from zero to launch" 
+              style={{ width: "100%", height: "auto", border: "4px solid var(--navy)", boxShadow: "10px 10px 0 var(--orange)", borderRadius: 8 }} 
+            />
+            <div style={{ position: "absolute", top: -16, right: -16, background: "var(--orange)", border: "2px solid var(--navy)", padding: "6px 14px", boxShadow: "3px 3px 0 var(--navy)", transform: "rotate(-4deg)" }}>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: "0.85rem", letterSpacing: "0.12em", color: "white" }}>ZERO GUESSWORK</p>
             </div>
           </div>
         </div>
@@ -199,7 +179,7 @@ export default function LandingPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
           {PHASES.map((phase) => (
-            <Link key={phase.num} href={`/checklist#phase-${parseInt(phase.num)}`}
+            <Link key={phase.num} href={`/checklist#phase-${phase.phaseId}`}
               className="panel"
               style={{ textDecoration: "none", display: "block", transition: "box-shadow 0.15s, transform 0.15s" }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = `4px 4px 0 ${phase.color}`; (e.currentTarget as HTMLElement).style.transform = "translate(-2px,-2px)"; }}
@@ -260,6 +240,37 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <div style={{ height: 3, background: `repeating-linear-gradient(-45deg, ${topic.color}, ${topic.color} 2px, transparent 2px, transparent 8px)` }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Industry Specific ───────────────────────────────────────── */}
+      <section style={{ padding: "48px 24px", background: "white", borderBottom: "2px solid var(--border)" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "var(--navy)", letterSpacing: "0.02em" }}>
+              BROWSE BY <span style={{ color: "var(--orange)" }}>INDUSTRY</span>
+            </h2>
+            <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-muted)", fontSize: "0.9rem", marginTop: 8 }}>
+              Check out launch guides and tool libraries mapped perfectly to your vertical.
+            </p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
+            {BUSINESS_CATEGORIES.map(c => (
+              <div key={c.value} className="panel" style={{ padding: "16px", background: "var(--surface)", border: "1.5px solid var(--border-light)" }}>
+                <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", fontWeight: 700, color: "var(--navy)", marginBottom: 12 }}>
+                  {c.label}
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <Link href={`/guides?industry=${c.value}`} style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", color: "var(--orange)", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
+                    Read Guides <ArrowRight style={{ width: 12, height: 12 }} />
+                  </Link>
+                  <Link href={`/resources?industry=${c.value}`} style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", color: "var(--orange)", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
+                    View Resources <ArrowRight style={{ width: 12, height: 12 }} />
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

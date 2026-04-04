@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Rocket } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 // Business categories mapped to top NAICS codes for new business formation
 // naics is the primary 6-digit code — used for filtering, not shown to users
@@ -17,9 +18,13 @@ export const BUSINESS_CATEGORIES = [
   { value: "ecommerce",       label: "E-Commerce / Retail",         desc: "Shopify store, Etsy shop, Amazon reseller, online products, reselling",                  naics: "454110" },
   { value: "beauty-wellness", label: "Beauty / Wellness / Fitness", desc: "Hair stylist, nail tech, personal trainer, yoga instructor, esthetician",                naics: "812112" },
   { value: "care-services",   label: "Care & Personal Services",    desc: "Dog walking, pet sitting, childcare, babysitting, errands, concierge",                   naics: "812990" },
+  { value: "saas",            label: "Software Publishers / SaaS Startups", desc: "B2B or B2C SaaS platforms, mobile application publishers, enterprise software",      naics: "513210" },
+  { value: "real-estate",     label: "Real Estate Agencies & Brokerages",   desc: "Independent real estate agents graduating to owning their own B2B brokerage",    naics: "531210" },
+  { value: "logistics",       label: "Logistics / Freight / Trucking",      desc: "Owner-operators starting an independent logistics or long-haul trucking business", naics: "484121" },
+  { value: "medspa",          label: "Private Healthcare / MedSpa Practices", desc: "Nurse practitioners, functional medicine doctors, physical therapists",            naics: "621399" },
 ];
 
-type QuizStep = "businessType" | "stage" | "email" | "loading";
+type QuizStep = "businessType" | "stage" | "projectName" | "email" | "loading";
 
 const STAGE_OPTIONS = [
   { value: "idea",       label: "Just an idea",            desc: "Haven't started anything yet" },
@@ -31,6 +36,7 @@ const STAGE_OPTIONS = [
 const STEP_COLORS: Record<QuizStep, string> = {
   businessType: "#F97316",
   stage:        "#8B5CF6",
+  projectName:  "#0EA5E9",
   email:        "#16A34A",
   loading:      "#F97316",
 };
@@ -40,26 +46,49 @@ export default function QuizPage() {
   const [quizStep, setQuizStep] = useState<QuizStep>("businessType");
   const [businessType, setBusinessType] = useState<string | null>(null);
   const [stage, setStage]               = useState<string | null>(null);
+  const [projectName, setProjectName] = useState("");
   const [email, setEmail]               = useState("");
   const [emailError, setEmailError]     = useState("");
 
   const color = STEP_COLORS[quizStep];
-  const stepNum = quizStep === "businessType" ? 1 : quizStep === "stage" ? 2 : quizStep === "email" ? 3 : 3;
+  const stepNum = quizStep === "businessType" ? 1 : quizStep === "stage" ? 2 : quizStep === "projectName" ? 3 : quizStep === "email" ? 4 : 4;
 
-  function saveAndRedirect(emailVal: string) {
+  async function saveAndRedirect(emailVal: string) {
     const answers = {
       businessType: businessType!,
       stage:        stage!,
-      email:        emailVal.trim() || null,
+      projectName:  projectName.trim() || "My New Business",
+      email:        emailVal.trim(),
       completedAt:  new Date().toISOString(),
     };
     localStorage.setItem("launchadvisor_quiz", JSON.stringify(answers));
+    if (projectName.trim()) {
+      localStorage.setItem("launchadvisor_project_name", projectName.trim());
+    }
     if (emailVal.trim()) {
       localStorage.setItem("launchadvisor_email", emailVal.trim());
       localStorage.setItem("launchadvisor_email_prompted", "true");
     }
     setQuizStep("loading");
-    setTimeout(() => router.push("/checklist"), 2000);
+
+    // Write Cloud context
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+       const { data: newWs } = await supabase.from("workspaces").insert({
+           user_id: user.id,
+           project_name: answers.projectName,
+           business_type: answers.businessType,
+           stage: answers.stage
+       }).select().single();
+       if (newWs) {
+         localStorage.setItem("launchadvisor_active_workspace", newWs.id);
+         // Erase existing local progress when starting a new workspace context
+         localStorage.removeItem("launchadvisor_progress");
+       }
+    }
+
+    setTimeout(() => router.push("/checklist"), 1500);
   }
 
   function handleEmailSubmit(e: React.FormEvent) {
@@ -106,7 +135,7 @@ export default function QuizPage() {
         </span>
         {/* Step dots */}
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {(["businessType", "stage", "email"] as QuizStep[]).map((s, i) => (
+          {(["businessType", "stage", "projectName", "email"] as QuizStep[]).map((s, i) => (
             <div key={s} style={{
               width: s === quizStep ? 24 : 8,
               height: 8,
@@ -124,7 +153,7 @@ export default function QuizPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
             <div style={{ height: 2, width: 32, background: color }} />
             <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
-              Step {stepNum} of 3
+              Step {stepNum} of 4
             </span>
           </div>
 
@@ -207,12 +236,51 @@ export default function QuizPage() {
                   ← Back
                 </button>
                 <button
-                  onClick={() => { if (stage) setQuizStep("email"); }}
+                  onClick={() => { if (stage) setQuizStep("projectName"); }}
                   disabled={!stage}
                   className="btn btn-primary"
                   style={{ flex: 1, fontSize: "0.85rem", padding: "14px 24px", opacity: stage ? 1 : 0.4, cursor: stage ? "pointer" : "not-allowed", justifyContent: "center" }}
                 >
                   Next <ArrowRight style={{ width: 16, height: 16 }} />
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* ── STEP 3: Project Name ──────────────────────── */}
+          {quizStep === "projectName" && (
+            <>
+              <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 5vw, 3rem)", letterSpacing: "0.02em", color: "white", lineHeight: 1.05, marginBottom: 10 }}>
+                What are you calling it?
+              </h1>
+              <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.45)", fontSize: "0.95rem", marginBottom: 28 }}>
+                You can change this later. It just helps us personalize your workspace.
+              </p>
+              <form onSubmit={(e) => { e.preventDefault(); if (projectName.trim()) setQuizStep("email"); }} style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+                <input
+                  type="text"
+                  placeholder="Acme Corp, My Project..."
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  autoFocus
+                  style={{
+                    width: "100%", padding: "16px 18px",
+                    background: "rgba(255,255,255,0.06)",
+                    border: "2px solid rgba(255,255,255,0.2)",
+                    color: "white", fontFamily: "var(--font-body)", fontSize: "1rem",
+                    outline: "none",
+                  }}
+                />
+                <button type="submit" disabled={!projectName.trim()} className="btn btn-primary" style={{ fontSize: "0.85rem", padding: "14px 24px", opacity: projectName.trim() ? 1 : 0.4, cursor: projectName.trim() ? "pointer" : "not-allowed", justifyContent: "center" }}>
+                  Next <ArrowRight style={{ width: 16, height: 16 }} />
+                </button>
+              </form>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={() => setQuizStep("stage")}
+                  style={{ padding: "10px 18px", border: "2px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontFamily: "var(--font-heading)", fontSize: "0.78rem", fontWeight: 600 }}
+                >
+                  ← Back
                 </button>
               </div>
             </>
@@ -224,11 +292,8 @@ export default function QuizPage() {
               <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 5vw, 3rem)", letterSpacing: "0.02em", color: "white", lineHeight: 1.05, marginBottom: 10 }}>
                 Save your plan
               </h1>
-              <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.45)", fontSize: "0.95rem", marginBottom: 8 }}>
+              <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.45)", fontSize: "0.95rem", marginBottom: 28 }}>
                 Enter your email and we'll save your progress so you don't lose it. No spam, ever.
-              </p>
-              <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.25)", fontSize: "0.8rem", marginBottom: 28 }}>
-                You can also skip this and save later.
               </p>
               <form onSubmit={handleEmailSubmit} style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
                 <input
@@ -254,16 +319,10 @@ export default function QuizPage() {
               </form>
               <div style={{ display: "flex", gap: 10 }}>
                 <button
-                  onClick={() => setQuizStep("stage")}
+                  onClick={() => setQuizStep("projectName")}
                   style={{ padding: "10px 18px", border: "2px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontFamily: "var(--font-heading)", fontSize: "0.78rem", fontWeight: 600 }}
                 >
                   ← Back
-                </button>
-                <button
-                  onClick={() => saveAndRedirect("")}
-                  style={{ padding: "10px 18px", background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body)", fontSize: "0.8rem", color: "rgba(255,255,255,0.35)" }}
-                >
-                  Skip — I'll save later
                 </button>
               </div>
             </>

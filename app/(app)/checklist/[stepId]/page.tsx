@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, ExternalLink,
   Loader2, Zap, FileText, Sparkles, Diamond,
   BarChart2, Palette, ClipboardList, Search as SearchIcon, MessageCircle, BriefcaseIcon,
 } from "lucide-react";
+import * as Icons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { getStepById, getAdjacentSteps, getPhaseColor, phases } from "@/lib/data/checklist";
 import { getGuidesForStep } from "@/lib/data/guides/index";
@@ -78,18 +80,46 @@ export default function StepDetailPage() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   useEffect(() => {
+    let currentBusinessType: string | null = null;
     const savedProgress = localStorage.getItem("launchadvisor_progress");
     if (savedProgress && step) {
       setIsDone(new Set<string>(JSON.parse(savedProgress)).has(step.id));
     }
     const quiz = localStorage.getItem("launchadvisor_quiz");
     if (quiz) {
-      try { setQuizBusinessType(JSON.parse(quiz).businessType ?? null); } catch { /* ignore */ }
+      try { 
+        currentBusinessType = JSON.parse(quiz).businessType ?? null; 
+        setQuizBusinessType(currentBusinessType); 
+      } catch { /* ignore */ }
     }
+    
+    async function loadJournal() {
+      if (!step) return;
+      const activeWs = localStorage.getItem("launchadvisor_active_workspace");
+      if (activeWs && activeWs !== "local") {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("workspace_journals")
+          .select("content")
+          .eq("workspace_id", activeWs)
+          .eq("step_id", step.id)
+          .single();
+        if (data?.content) {
+          setJournalEntry(data.content);
+          localStorage.setItem(`launchadvisor_journal_${step.id}`, data.content);
+        } else {
+          const fallback = localStorage.getItem(`launchadvisor_journal_${step.id}`);
+          if (fallback) setJournalEntry(fallback);
+        }
+      } else {
+        const saved = localStorage.getItem(`launchadvisor_journal_${step.id}`);
+        if (saved) setJournalEntry(saved);
+      }
+    }
+
     if (step) {
-      const saved = localStorage.getItem(`launchadvisor_journal_${step.id}`);
-      if (saved) setJournalEntry(saved);
-      getGuidesForStep(step.id).then(setRelatedGuides).catch(() => {});
+      loadJournal();
+      getGuidesForStep(step.id, currentBusinessType || undefined).then(setRelatedGuides).catch(() => {});
     }
   }, [stepId, step]);
 
@@ -105,33 +135,84 @@ export default function StepDetailPage() {
   const color          = getPhaseColor(step.phase);
   const phaseIdx       = phases.findIndex((p) => p.number === step.phase);
   const displayPhaseNum = phaseIdx + 1;
-  const premiumFeatures = getPremiumFeaturesForPhase(step.phase);
-
-  const filteredGuides = quizBusinessType
-    ? relatedGuides.filter(g => !g.businessTypes || g.businessTypes.includes(quizBusinessType))
-    : relatedGuides;
+  const premiumFeatures = step.premiumFeatures && step.premiumFeatures.length > 0 
+    ? step.premiumFeatures 
+    : getPremiumFeaturesForPhase(step.phase);
 
   const businessTypeLabel = quizBusinessType
     ? BUSINESS_CATEGORIES.find(b => b.value === quizBusinessType)?.label ?? null
     : null;
 
-  function handleToggleDone() {
+  async function handleToggleDone() {
+    const savedEntry = localStorage.getItem(`launchadvisor_journal_${step!.id}`);
+    if (!isDone && (!savedEntry || !savedEntry.trim())) {
+      alert("Please save a note in your journal before checking this step off.");
+      document.getElementById("journal-textarea")?.focus();
+      return;
+    }
     const newState = !isDone;
     setIsDone(newState);
+    
+    // Write Local
     const raw = localStorage.getItem("launchadvisor_progress");
     const set = raw ? new Set<string>(JSON.parse(raw)) : new Set<string>();
     newState ? set.add(step!.id) : set.delete(step!.id);
     localStorage.setItem("launchadvisor_progress", JSON.stringify(Array.from(set)));
+
+    // Write Cloud
+    const activeWs = localStorage.getItem("launchadvisor_active_workspace");
+    if (activeWs && activeWs !== "local") {
+        const supabase = createClient();
+        await supabase.from("workspace_progress").upsert({
+            workspace_id: activeWs,
+            step_id: step!.id,
+            is_done: newState
+        }, { onConflict: "workspace_id, step_id" });
+    }
   }
 
   async function handleSaveJournal() {
     if (!journalEntry.trim()) return;
     setSaving(true);
     await new Promise((r) => setTimeout(r, 400));
+    
+    // Write Local
     localStorage.setItem(`launchadvisor_journal_${step!.id}`, journalEntry);
+    
+    // Write Cloud
+    const activeWs = localStorage.getItem("launchadvisor_active_workspace");
+    let needsSupabaseProgressUpdate = false;
+
+    if (activeWs && activeWs !== "local") {
+        const supabase = createClient();
+        await supabase.from("workspace_journals").upsert({
+            workspace_id: activeWs,
+            step_id: step!.id,
+            content: journalEntry
+        }, { onConflict: "workspace_id, step_id" });
+        needsSupabaseProgressUpdate = true;
+    }
+
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+
+    if (!isDone) {
+      setIsDone(true);
+      const raw = localStorage.getItem("launchadvisor_progress");
+      const set = raw ? new Set<string>(JSON.parse(raw)) : new Set<string>();
+      set.add(step!.id);
+      localStorage.setItem("launchadvisor_progress", JSON.stringify(Array.from(set)));
+      
+      if (needsSupabaseProgressUpdate && activeWs) {
+        const supabase = createClient();
+        await supabase.from("workspace_progress").upsert({
+            workspace_id: activeWs,
+            step_id: step!.id,
+            is_done: true
+        }, { onConflict: "workspace_id, step_id" });
+      }
+    }
   }
 
   async function handleAiJournal() {
@@ -194,10 +275,35 @@ export default function StepDetailPage() {
           </button>
         </div>
 
-        {/* What this step is about */}
-        <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-mid)", lineHeight: 1.75, marginBottom: 20, fontSize: "0.97rem" }}>
-          {step.description}
-        </p>
+        {/* ── Context & Strategy ── */}
+        <div style={{ marginBottom: 28 }}>
+          {step.whyItMatters ? (
+            <>
+              <div style={{ marginBottom: 18 }}>
+                <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: "0.82rem", fontWeight: 700, color: "var(--navy)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>Why it matters</span>
+                <p style={{ fontFamily: "var(--font-body)", color: "var(--ink)", lineHeight: 1.65, fontSize: "0.95rem", margin: 0 }}>
+                  {step.whyItMatters}
+                </p>
+              </div>
+              <div style={{ marginBottom: 18 }}>
+                <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: "0.82rem", fontWeight: 700, color: "var(--navy)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>How to do it</span>
+                <p style={{ fontFamily: "var(--font-body)", color: "var(--ink)", lineHeight: 1.65, fontSize: "0.95rem", margin: 0, whiteSpace: "pre-wrap" }}>
+                  {step.howToDoIt}
+                </p>
+              </div>
+              <div>
+                <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: "0.82rem", fontWeight: 700, color: "var(--navy)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>What to start with</span>
+                <p style={{ fontFamily: "var(--font-body)", color: "var(--ink)", lineHeight: 1.65, fontSize: "0.95rem", margin: 0 }}>
+                  {step.whatToStartWith}
+                </p>
+              </div>
+            </>
+          ) : (
+            <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-mid)", lineHeight: 1.75, marginBottom: 20, fontSize: "0.97rem" }}>
+              {step.description}
+            </p>
+          )}
+        </div>
 
         {/* Do this now — the exercise */}
         <div style={{ background: `${color}0E`, border: `1.5px solid ${color}33`, padding: "14px 16px", marginBottom: 24 }}>
@@ -248,6 +354,7 @@ export default function StepDetailPage() {
             {step.journalPrompt}
           </p>
           <textarea
+            id="journal-textarea"
             value={journalEntry}
             onChange={(e) => setJournalEntry(e.target.value)}
             placeholder="Write your thoughts here..."
@@ -281,8 +388,10 @@ export default function StepDetailPage() {
             </span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: `repeat(${premiumFeatures.length}, 1fr)`, gap: 10 }}>
-            {premiumFeatures.map((feat) => {
-              const FeatureIcon = feat.icon;
+            {premiumFeatures.map((feat: any) => {
+              const FeatureIcon = typeof feat.icon === "string" 
+                ? ((Icons as any)[feat.icon] || Icons.Sparkles) 
+                : feat.icon;
               return (
                 <div
                   key={feat.id}
@@ -312,7 +421,7 @@ export default function StepDetailPage() {
       )}
 
       {/* ── Go deeper: guides filtered by business type ───────── */}
-      {filteredGuides.length > 0 && (
+      {relatedGuides.length > 0 && (
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             <div style={{ height: 1, width: 24, background: color }} />
@@ -326,7 +435,7 @@ export default function StepDetailPage() {
             )}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {filteredGuides.map((guide) => (
+            {relatedGuides.map((guide) => (
               <Link key={guide.slug} href={`/guides/${guide.slug}`} style={{ textDecoration: "none" }}>
                 <div
                   className="panel"
@@ -353,14 +462,6 @@ export default function StepDetailPage() {
               </Link>
             ))}
           </div>
-          {quizBusinessType && filteredGuides.length < relatedGuides.length && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", color: "var(--ink-muted)", marginTop: 10, textAlign: "center" }}>
-              Showing guides for {businessTypeLabel}.{" "}
-              <button onClick={() => setRelatedGuides(relatedGuides)} style={{ background: "none", border: "none", cursor: "pointer", color, fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600, textDecoration: "underline" }}>
-                Show all {relatedGuides.length}
-              </button>
-            </p>
-          )}
         </div>
       )}
 

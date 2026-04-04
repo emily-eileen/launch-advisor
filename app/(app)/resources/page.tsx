@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { ExternalLink, Search, ArrowRight } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Resource {
   id: string;
@@ -34,6 +35,30 @@ const CATEGORY_META: Record<string, { color: string }> = {
   "E-commerce":        { color: "#F97316" },
   "Productivity":      { color: "#0EA5E9" },
 };
+
+const CATEGORY_TO_PHASE: Record<string, number> = {
+  "Entity Formation": 4, "Legal": 4,
+  "Banking": 5, "Business Credit": 5, "Accounting": 5, "Payments": 5,
+  "Trademark": 8, "Insurance": 8,
+  "Branding": 7, "Website": 7,
+  "Marketing": 9, "Newsletter": 9, "SEO & Growth": 9, "CRM & Sales": 9,
+  "E-commerce": 2,
+  "Automation": 10, "HR & Payroll": 10, "Productivity": 10,
+};
+
+const PHASE_FILTERS = [
+  { num: "All", label: "All Phases", color: "var(--navy)" },
+  { num: "1",   label: "01 Validate", color: "#F97316" },
+  { num: "4",   label: "02 Form",     color: "#8B5CF6" },
+  { num: "5",   label: "03 Finance",  color: "#16A34A" },
+  { num: "2",   label: "04 Build",    color: "#0EA5E9" },
+  { num: "7",   label: "05 Brand",    color: "#EF4444" },
+  { num: "8",   label: "06 Protect",  color: "#F59E0B" },
+  { num: "6",   label: "07 Locate",   color: "#EC4899" },
+  { num: "3",   label: "08 Price",    color: "#06B6D4" },
+  { num: "9",   label: "09 Sell",     color: "#A855F7" },
+  { num: "10",  label: "10 Operate",  color: "#14B8A6" },
+];
 
 const categories = [
   "All",
@@ -188,15 +213,48 @@ const resources: Resource[] = [
   { id: "pr7",  name: "Monday.com", category: "Productivity", color: "#0EA5E9",                            description: "Visual project management for teams — tracks tasks, timelines, and goals.", url: "https://monday.com",           affiliateUrl: "https://monday.com" },
 ];
 
-export default function ResourcesPage() {
+const BUSINESS_CATEGORIES = [
+  { value: "all",             label: "All Industries (General)",    naics: "" },
+  { value: "consulting",      label: "Consulting / Coaching",       naics: "541611" },
+  { value: "tech",            label: "Tech / IT / App",             naics: "541512" },
+  { value: "creative",        label: "Creative Services",           naics: "541810" },
+  { value: "home-services",   label: "Home & Property Services",    naics: "561720" },
+  { value: "trades",          label: "Trades & Construction",       naics: "238220" },
+  { value: "food",            label: "Food & Beverage",             naics: "722330" },
+  { value: "str",             label: "Short-Term Rental / Airbnb",  naics: "721199" },
+  { value: "ecommerce",       label: "E-Commerce / Retail",         naics: "454110" },
+  { value: "beauty-wellness", label: "Beauty / Wellness / Fitness", naics: "812112" },
+  { value: "care-services",   label: "Care & Personal Services",    naics: "812990" },
+  { value: "saas",            label: "Software Publishers / SaaS Startups", naics: "513210" },
+  { value: "real-estate",     label: "Real Estate Agencies & Brokerages", naics: "531210" },
+  { value: "logistics",       label: "Logistics / Freight / Trucking", naics: "484121" },
+  { value: "medspa",          label: "Private Healthcare / MedSpa Practices", naics: "621399" },
+];
+
+function ResourcesContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialIndustry = searchParams.get("industry") || "all";
+  
+  const [selectedPhase, setSelectedPhase] = useState("All");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
 
+  const handleIndustryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val && val !== "all") {
+      router.push(`/resources?industry=${val}`);
+    } else {
+      router.push(`/resources`);
+    }
+  };
+
   const filtered = resources.filter((r) => {
+    const matchPhase = selectedPhase === "All" || CATEGORY_TO_PHASE[r.category] === parseInt(selectedPhase);
     const matchCat = selectedCategory === "All" || r.category === selectedCategory;
     const q = search.toLowerCase();
     const matchSearch = !q || r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q) || r.category.toLowerCase().includes(q);
-    return matchCat && matchSearch;
+    return matchPhase && matchCat && matchSearch;
   });
 
   const affiliateCount = filtered.filter(r => r.affiliateUrl).length;
@@ -220,16 +278,54 @@ export default function ResourcesPage() {
         </p>
       </div>
 
-      {/* ── Search ────────────────────────────────────────── */}
-      <div style={{ position: "relative" }}>
-        <Search style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "var(--ink-muted)" }} />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search tools..."
-          style={{ paddingLeft: 36 }}
-        />
+      {/* ── Search & Industry ────────────────────────────────────────── */}
+      <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+        <div style={{ position: "relative", flex: "1 1 280px" }}>
+          <Search style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "var(--ink-muted)" }} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search tools & resources..."
+            style={{ paddingLeft: 36, width: "100%", padding: "12px 12px 12px 36px", border: "1px solid var(--border-light)", fontSize: "0.9rem", borderRadius: 4 }}
+          />
+        </div>
+        <div style={{ flex: "0 0 240px" }}>
+          <select
+            value={initialIndustry}
+            onChange={handleIndustryChange}
+            style={{ width: "100%", padding: "12px", border: "1px solid var(--border-light)", fontSize: "0.9rem", background: "white", borderRadius: 4 }}
+          >
+            {BUSINESS_CATEGORIES.map(c => (
+              <option key={c.value} value={c.value}>
+                {c.label} {c.naics ? `(NAICS: ${c.naics})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* ── Phase pills ───────────────────────────────────── */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: -6 }}>
+        {PHASE_FILTERS.map((phase) => {
+          const isActive = selectedPhase === phase.num;
+          return (
+            <button
+              key={phase.num}
+              onClick={() => setSelectedPhase(phase.num)}
+              style={{
+                fontFamily: "var(--font-heading)", fontSize: "0.68rem", fontWeight: 700,
+                letterSpacing: "0.05em", textTransform: "uppercase", padding: "5px 11px",
+                border: `2px solid ${isActive ? phase.color : "var(--border-light)"}`,
+                background: isActive ? phase.color : "transparent",
+                color: isActive ? "white" : "var(--ink-muted)",
+                cursor: "pointer", transition: "all 0.12s",
+              }}
+            >
+              {phase.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── Category pills ────────────────────────────────── */}
@@ -242,11 +338,11 @@ export default function ResourcesPage() {
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               style={{
-                fontFamily: "var(--font-heading)", fontSize: "0.68rem", fontWeight: 700,
-                letterSpacing: "0.05em", textTransform: "uppercase", padding: "5px 11px",
-                border: `2px solid ${isActive ? color : "var(--border-light)"}`,
-                background: isActive ? color : "transparent",
-                color: isActive ? "white" : "var(--ink-muted)",
+                fontFamily: "var(--font-heading)", fontSize: "0.65rem", fontWeight: 600,
+                padding: "3px 9px", borderRadius: 4,
+                border: `1.5px solid ${isActive ? color : "var(--border-light)"}`,
+                background: isActive ? `${color}11` : "transparent",
+                color: isActive ? color : "var(--ink-muted)",
                 cursor: "pointer", transition: "all 0.12s",
               }}
             >
@@ -299,7 +395,6 @@ export default function ResourcesPage() {
                     {resource.name}
                   </h3>
                   <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                    {hasAffiliate && <span className="affiliate-badge">Partner</span>}
                     <ExternalLink style={{ width: 12, height: 12, color: "var(--ink-muted)", opacity: 0.5 }} />
                   </div>
                 </div>
@@ -341,5 +436,13 @@ export default function ResourcesPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ResourcesPage() {
+  return (
+    <Suspense fallback={<div>Loading resources...</div>}>
+      <ResourcesContent />
+    </Suspense>
   );
 }
