@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, ChevronDown, ChevronRight, ArrowRight, Zap, X } from "lucide-react";
 import { phases, checklistSteps } from "@/lib/data/checklist";
 
-const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B"];
+const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899", "#06B6D4", "#A855F7", "#14B8A6"];
 
 const TYPE_LABELS: Record<string, string> = {
   service: "Service / Consulting",
@@ -14,10 +14,10 @@ const TYPE_LABELS: Record<string, string> = {
   local: "Local Business",
 };
 const CONCERN_PHASE: Record<string, number> = {
-  legal: 2,
-  money: 3,
-  customers: 4,
-  product: 6,
+  legal: 4,     // Form
+  money: 5,     // Finance
+  customers: 9, // Sell
+  product: 2,   // Build
 };
 
 interface QuizAnswers {
