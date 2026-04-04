@@ -16,10 +16,10 @@ const PHASE_ICON_MAP: Record<string, LucideIcon> = {
 
 export default function PhasePage() {
   const params = useParams();
-  const num = parseInt(params.num as string, 10);
-  const phase = phases.find((p) => p.number === num);
+  const num    = parseInt(params.num as string, 10);
+  const phase  = phases.find((p) => p.number === num);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
-  const [hydrated, setHydrated] = useState(false);
+  const [hydrated, setHydrated]   = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("launchadvisor_progress");
@@ -36,15 +36,21 @@ export default function PhasePage() {
     );
   }
 
-  const color = getPhaseColor(num);
+  const color        = getPhaseColor(num);
   const PhaseIconComp: LucideIcon = PHASE_ICON_MAP[phase.icon] ?? Search;
-  const phaseSteps = checklistSteps.filter((s) => s.phase === num);
-  const doneCnt = hydrated ? phaseSteps.filter((s) => completed.has(s.id)).length : 0;
+  const phaseSteps   = checklistSteps.filter((s) => s.phase === num);
+  const phaseIdx     = phases.findIndex((p) => p.number === num);
+  const doneCnt      = hydrated ? phaseSteps.filter((s) => completed.has(s.id)).length : 0;
 
-  // Find adjacent phases in display order
-  const phaseIdx = phases.findIndex((p) => p.number === num);
   const prevPhase = phaseIdx > 0 ? phases[phaseIdx - 1] : null;
   const nextPhase = phaseIdx < phases.length - 1 ? phases[phaseIdx + 1] : null;
+
+  function handleToggle(stepId: string) {
+    const next = new Set(completed);
+    if (next.has(stepId)) next.delete(stepId); else next.add(stepId);
+    setCompleted(next);
+    localStorage.setItem("launchadvisor_progress", JSON.stringify(Array.from(next)));
+  }
 
   return (
     <div style={{ maxWidth: 680, display: "flex", flexDirection: "column", gap: 24 }}>
@@ -65,17 +71,11 @@ export default function PhasePage() {
           <div style={{ width: 28, height: 28, background: color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <PhaseIconComp style={{ width: 14, height: 14, color: "white" }} />
           </div>
-          <span style={{
-            fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em",
-            textTransform: "uppercase", color,
-          }}>
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em", textTransform: "uppercase", color }}>
             Phase {String(phaseIdx + 1).padStart(2, "0")}
           </span>
         </div>
-        <h1 style={{
-          fontFamily: "var(--font-display)", fontSize: "2.8rem", letterSpacing: "0.03em",
-          color: "var(--navy)", lineHeight: 1, marginBottom: 10,
-        }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.8rem", letterSpacing: "0.03em", color: "var(--navy)", lineHeight: 1, marginBottom: 10 }}>
           {phase.name.toUpperCase()}
         </h1>
         <p style={{ fontFamily: "var(--font-body)", fontSize: "0.92rem", color: "var(--ink-mid)", lineHeight: 1.6, margin: 0 }}>
@@ -88,77 +88,71 @@ export default function PhasePage() {
         )}
       </div>
 
-      {/* ── Steps ─────────────────────────────────────────────── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {phaseSteps.map((step) => {
+      {/* ── Steps with checkboxes ─────────────────────────────── */}
+      <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
+        {phaseSteps.map((step, si) => {
           const isDone = hydrated && completed.has(step.id);
-
           return (
-            <Link
+            <div
               key={step.id}
-              href={`/checklist/${step.id}`}
-              style={{ textDecoration: "none" }}
+              style={{
+                display: "flex", alignItems: "stretch",
+                borderBottom: si < phaseSteps.length - 1 ? "1px solid var(--border-light)" : "none",
+                borderLeft: `3px solid ${isDone ? color : "transparent"}`,
+                background: isDone ? `${color}06` : "transparent",
+                transition: "all 0.12s",
+              }}
             >
-              <div
-                className="panel"
+              {/* Checkbox toggle */}
+              <button
+                onClick={() => handleToggle(step.id)}
+                title={isDone ? "Mark incomplete" : "Mark complete"}
                 style={{
-                  display: "flex", alignItems: "center", gap: 14,
-                  padding: "16px 20px",
-                  borderLeft: `3px solid ${isDone ? color : "var(--border-light)"}`,
-                  transition: "all 0.12s",
-                  opacity: isDone ? 0.72 : 1,
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.borderLeftColor = color;
-                  (e.currentTarget as HTMLElement).style.transform = "translateX(2px)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.borderLeftColor = isDone ? color : "var(--border-light)";
-                  (e.currentTarget as HTMLElement).style.transform = "";
+                  flexShrink: 0, width: 48, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: isDone ? `${color}12` : "transparent",
+                  border: "none", borderRight: "1px solid var(--border-light)",
+                  cursor: "pointer", transition: "background 0.15s",
                 }}
               >
-                {/* Phase icon (colored when done, muted when pending) */}
+                {/* Custom checkbox look */}
                 <div style={{
-                  width: 32, height: 32, flexShrink: 0,
+                  width: 18, height: 18,
+                  border: `2px solid ${isDone ? color : "var(--border)"}`,
+                  background: isDone ? color : "transparent",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  background: isDone ? `${color}15` : "var(--border-light)",
-                  border: `1.5px solid ${isDone ? color : "var(--border)"}`,
+                  transition: "all 0.15s",
                 }}>
-                  {isDone
-                    ? <CheckCircle2 style={{ width: 14, height: 14, color }} />
-                    : <PhaseIconComp style={{ width: 13, height: 13, color: "var(--ink-muted)" }} />
-                  }
+                  {isDone && <CheckCircle2 style={{ width: 10, height: 10, color: "white" }} />}
                 </div>
+              </button>
 
-                {/* Step number + text */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 2 }}>
-                    <span style={{
-                      fontFamily: "var(--font-display)", fontSize: "0.6rem",
-                      color: isDone ? color : "var(--border)", letterSpacing: "0.08em", flexShrink: 0,
-                    }}>
-                      {phaseIdx + 1}.{step.order}
-                    </span>
-                    <p style={{
-                      fontFamily: "var(--font-heading)", fontSize: "0.9rem", fontWeight: 700,
-                      color: isDone ? "var(--ink-muted)" : "var(--navy)", lineHeight: 1.3,
-                      textDecoration: isDone ? "line-through" : "none",
-                      margin: 0,
-                    }}>
-                      {step.title}
-                    </p>
-                  </div>
-                  <p style={{
-                    fontFamily: "var(--font-body)", fontSize: "0.78rem",
-                    color: "var(--ink-muted)", lineHeight: 1.45, margin: 0,
-                  }}>
-                    {step.description.slice(0, 110)}{step.description.length > 110 ? "…" : ""}
-                  </p>
-                </div>
-
-                <ChevronRight style={{ width: 15, height: 15, color: isDone ? color : "var(--ink-muted)", flexShrink: 0, opacity: 0.6 }} />
-              </div>
-            </Link>
+              {/* Step link */}
+              <Link
+                href={`/checklist/${step.id}`}
+                style={{
+                  flex: 1, display: "flex", alignItems: "center", gap: 12,
+                  padding: "14px 16px", textDecoration: "none", transition: "background 0.1s",
+                }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = `${color}06`}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "transparent"}
+              >
+                <span style={{
+                  fontFamily: "var(--font-display)", fontSize: "0.6rem",
+                  color: isDone ? color : "var(--border)", minWidth: 28, flexShrink: 0, letterSpacing: "0.08em",
+                }}>
+                  {phaseIdx + 1}.{step.order}
+                </span>
+                <span style={{
+                  fontFamily: "var(--font-heading)", fontSize: "0.88rem", fontWeight: 600,
+                  color: isDone ? "var(--ink-muted)" : "var(--navy)",
+                  textDecoration: isDone ? "line-through" : "none",
+                  flex: 1, lineHeight: 1.35,
+                }}>
+                  {step.title}
+                </span>
+                <ChevronRight style={{ width: 14, height: 14, color: isDone ? color : "var(--border)", flexShrink: 0, opacity: 0.6 }} />
+              </Link>
+            </div>
           );
         })}
       </div>
@@ -166,22 +160,13 @@ export default function PhasePage() {
       {/* ── Phase navigation ──────────────────────────────────── */}
       <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, gap: 12 }}>
         {prevPhase ? (
-          <Link href={`/checklist/phase/${prevPhase.number}`} style={{
-            display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
-            fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 600,
-            color: "var(--ink-muted)",
-          }}>
+          <Link href={`/checklist/phase/${prevPhase.number}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none", fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 600, color: "var(--ink-muted)" }}>
             <ArrowLeft style={{ width: 13, height: 13 }} />
             {prevPhase.name}
           </Link>
         ) : <div />}
-
         {nextPhase ? (
-          <Link href={`/checklist/phase/${nextPhase.number}`} style={{
-            display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
-            fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 600,
-            color,
-          }}>
+          <Link href={`/checklist/phase/${nextPhase.number}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none", fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 600, color }}>
             {nextPhase.name}
             <ArrowRight style={{ width: 13, height: 13 }} />
           </Link>

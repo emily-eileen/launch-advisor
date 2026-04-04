@@ -6,10 +6,14 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   Settings, LogOut, Menu, X, Plus, ChevronDown, Rocket, BookOpen,
+  Search, Hammer, Tag, FileText, DollarSign, MapPin, Palette, Shield, Users,
 } from "lucide-react";
-import { phases, checklistSteps } from "@/lib/data/checklist";
+import type { LucideIcon } from "lucide-react";
+import { phases, checklistSteps, getPhaseColor } from "@/lib/data/checklist";
 
-const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899", "#06B6D4", "#A855F7", "#14B8A6"];
+const PHASE_ICON_MAP: Record<string, LucideIcon> = {
+  Search, Hammer, Tag, FileText, DollarSign, MapPin, Palette, Shield, Users, Settings,
+};
 
 const MOCK_BUSINESSES = [
   { id: "1", name: "Acme Ecommerce", type: "E-commerce" },
@@ -168,13 +172,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* ── Phase navigation (primary) ─────────────────── */}
         <nav style={{ flex: 1, overflowY: "auto", padding: "6px 0" }}>
-          {phases.map((phase, i) => {
-            const color      = PHASE_COLORS[i];
+          {phases.map((phase) => {
+            const color      = getPhaseColor(phase.number);
+            const PhaseIcon  = PHASE_ICON_MAP[phase.icon] ?? Search;
             const phaseSteps = checklistSteps.filter((s) => s.phase === phase.number);
             const done       = phaseSteps.filter((s) => completed.has(s.id)).length;
             const pct        = phaseSteps.length ? (done / phaseSteps.length) * 100 : 0;
-            const isActive   = activePhase === phase.number ||
-              (pathname === "/checklist" && false); // highlight only on step pages
+            const isActive   = activePhase === phase.number;
             const isComplete = done === phaseSteps.length;
 
             return (
@@ -184,7 +188,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 onClick={() => setSidebarOpen(false)}
                 style={{
                   display: "block",
-                  padding: "10px 14px 10px 16px",
+                  padding: "9px 14px 9px 12px",
                   textDecoration: "none",
                   borderLeft: `3px solid ${isActive ? color : "transparent"}`,
                   background: isActive ? `${color}18` : "transparent",
@@ -193,22 +197,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 }}
                 className="phase-nav-item"
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-                  {/* Phase num */}
-                  <span style={{
-                    fontFamily: "var(--font-display)", fontSize: "0.75rem",
-                    color: isActive ? color : "rgba(255,255,255,0.2)",
-                    letterSpacing: "0.06em", minWidth: 22, flexShrink: 0,
-                    transition: "color 0.15s",
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {/* Phase icon */}
+                  <div style={{
+                    width: 20, height: 20, flexShrink: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    background: isActive ? color : isComplete ? `${color}40` : "rgba(255,255,255,0.06)",
+                    transition: "background 0.15s",
                   }}>
-                    {String(phase.number).padStart(2, "0")}
-                  </span>
+                    <PhaseIcon style={{ width: 10, height: 10, color: isActive ? "white" : isComplete ? color : "rgba(255,255,255,0.4)" }} />
+                  </div>
 
                   {/* Phase name */}
                   <span style={{
-                    fontFamily: "var(--font-display)", fontSize: "0.88rem",
+                    fontFamily: "var(--font-display)", fontSize: "0.82rem",
                     letterSpacing: "0.08em", textTransform: "uppercase",
-                    color: isActive ? "white" : isComplete ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.7)",
+                    color: isActive ? "white" : isComplete ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.65)",
                     flex: 1, transition: "color 0.15s",
                   }}>
                     {phase.name}
@@ -216,17 +220,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
                   {/* Count badge */}
                   <span style={{
-                    fontFamily: "var(--font-display)", fontSize: "0.65rem",
-                    color: isComplete ? color : "rgba(255,255,255,0.3)",
+                    fontFamily: "var(--font-display)", fontSize: "0.58rem",
+                    color: isComplete ? color : "rgba(255,255,255,0.25)",
                     letterSpacing: "0.05em", flexShrink: 0,
                   }}>
                     {done}/{phaseSteps.length}
                   </span>
                 </div>
 
-                {/* Mini phase progress bar */}
-                <div style={{ marginTop: 5, height: 2, background: "rgba(255,255,255,0.07)", overflow: "hidden", marginLeft: 22 }}>
-                  <div style={{ height: "100%", width: `${pct}%`, background: color, transition: "width 0.6s ease", opacity: isActive ? 1 : 0.6 }} />
+                {/* Mini progress bar */}
+                <div style={{ marginTop: 4, height: 2, background: "rgba(255,255,255,0.07)", overflow: "hidden", marginLeft: 28 }}>
+                  <div style={{ height: "100%", width: `${pct}%`, background: color, transition: "width 0.6s ease", opacity: isActive ? 1 : 0.7 }} />
                 </div>
               </Link>
             );
