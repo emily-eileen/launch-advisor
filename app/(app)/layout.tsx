@@ -23,6 +23,8 @@ const MOCK_BUSINESSES = [
   { id: "2", name: "Consulting Co", type: "Services", progress: 6 },
 ];
 
+const PUBLIC_PATHS = ["/checklist", "/resources"];
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<{ email?: string; id?: string } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,21 +34,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+
   useEffect(() => {
     async function getUser() {
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { router.push("/login"); return; }
-        setUser({ email: user.email, id: user.id });
+        if (!user && !isPublicPath) { router.push("/login"); return; }
+        setUser(user ? { email: user.email, id: user.id } : null);
       } catch {
-        setUser({ email: "dev@launchadvisor.com", id: "mock-user" });
+        setUser(null);
       } finally {
         setLoading(false);
       }
     }
     getUser();
-  }, [router]);
+  }, [router, isPublicPath]);
 
   async function handleSignOut() {
     try {
@@ -106,8 +110,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
 
-        {/* Business Switcher */}
-        <div style={{ padding: "12px 10px", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "relative" }}>
+        {/* Business Switcher — auth only */}
+        {user && <div style={{ padding: "12px 10px", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "relative" }}>
           <button
             onClick={() => setBizMenuOpen(!bizMenuOpen)}
             className="biz-switcher"
@@ -142,10 +146,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           )}
-        </div>
+        </div>}
 
-        {/* Progress blurb */}
-        <div style={{ padding: "10px 12px", margin: "8px 10px", background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.25)" }}>
+        {/* Progress blurb — auth only */}
+        {user && <div style={{ padding: "10px 12px", margin: "8px 10px", background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.25)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
             <span style={{ fontFamily: "var(--font-display)", fontSize: "0.6rem", letterSpacing: "0.15em", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>Overall progress</span>
             <span style={{ fontFamily: "var(--font-display)", fontSize: "0.85rem", color: "var(--orange)" }}>{activeBiz.progress}/30</span>
@@ -153,7 +157,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div style={{ height: 4, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${(activeBiz.progress / 30) * 100}%`, background: "var(--orange)" }} />
           </div>
-        </div>
+        </div>}
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: "8px 8px" }}>
@@ -171,15 +175,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* User footer */}
         <div style={{ padding: "12px 10px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ padding: "8px 12px", marginBottom: 4 }}>
-            <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600, color: "rgba(255,255,255,0.5)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {user?.email || "User"}
-            </p>
-          </div>
-          <button onClick={handleSignOut} className="sidebar-link" style={{ width: "100%", background: "none", border: "none", cursor: "pointer", display: "flex" }}>
-            <LogOut style={{ width: 16, height: 16 }} />
-            Sign out
-          </button>
+          {user ? (
+            <>
+              <div style={{ padding: "8px 12px", marginBottom: 4 }}>
+                <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600, color: "rgba(255,255,255,0.5)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {user.email}
+                </p>
+              </div>
+              <button onClick={handleSignOut} className="sidebar-link" style={{ width: "100%", background: "none", border: "none", cursor: "pointer", display: "flex" }}>
+                <LogOut style={{ width: 16, height: 16 }} />
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link href="/login" style={{ display: "block", margin: "4px 0", padding: "10px 14px", background: "var(--orange)", textAlign: "center", fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "white", textDecoration: "none" }}>
+              Save Progress →
+            </Link>
+          )}
         </div>
       </aside>
 

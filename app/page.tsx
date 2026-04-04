@@ -39,7 +39,7 @@ export default function LandingPage() {
             <Link href="/login" style={{ fontFamily: "var(--font-heading)", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)", padding: "8px 14px" }}>
               Sign in
             </Link>
-            <Link href="/login" className="btn btn-primary" style={{ fontSize: "0.75rem", padding: "9px 18px" }}>
+            <Link href="/quiz" className="btn btn-primary" style={{ fontSize: "0.75rem", padding: "9px 18px" }}>
               Start free <ArrowRight style={{ width: 14, height: 14 }} />
             </Link>
           </div>
@@ -72,8 +72,8 @@ export default function LandingPage() {
             </p>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginBottom: 36 }}>
-              <Link href="/login" className="btn btn-primary" style={{ fontSize: "0.82rem", padding: "12px 28px" }}>
-                Build my launch plan <ArrowRight style={{ width: 16, height: 16 }} />
+              <Link href="/quiz" className="btn btn-primary" style={{ fontSize: "0.82rem", padding: "12px 28px" }}>
+                See my personalized plan <ArrowRight style={{ width: 16, height: 16 }} />
               </Link>
               <a href="#how-it-works" style={{ fontFamily: "var(--font-heading)", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", padding: "12px 20px", border: "2px solid rgba(255,255,255,0.15)", display: "inline-flex", alignItems: "center", gap: 8 }}>
                 See how it works
