@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { phases, checklistSteps } from "@/lib/data/checklist";
 
-const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899"];
+const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899", "#06B6D4"];
 
 const MOCK_BUSINESSES = [
   { id: "1", name: "Acme Ecommerce", type: "E-commerce" },
