@@ -183,7 +183,7 @@ export default function ChecklistPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
           <div style={{ height: 1, width: 32, background: "var(--orange)" }} />
           <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-muted)" }}>
-            30 steps · 6 phases
+            {totalSteps} steps · 6 phases
           </span>
         </div>
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: "3rem", letterSpacing: "0.02em", color: "var(--navy)", lineHeight: 1 }}>
