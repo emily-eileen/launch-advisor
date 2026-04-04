@@ -5,8 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
-  BookOpen, Library, Settings,
-  LogOut, Menu, X, Plus, ChevronDown, Rocket,
+  Settings, LogOut, Menu, X, Plus, ChevronDown, Rocket,
 } from "lucide-react";
 import { phases, checklistSteps } from "@/lib/data/checklist";
 
@@ -236,21 +235,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* ── Secondary links ───────────────────────────── */}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", padding: "6px 0" }}>
-          {[
-            { href: "/resources", label: "Resources",  Icon: Library  },
-            { href: "/journal",   label: "Journal",    Icon: BookOpen },
-            { href: "/settings",  label: "Settings",   Icon: Settings },
-          ].map(({ href, label, Icon }) => {
-            const isActive = pathname.startsWith(href);
-            return (
-              <Link key={href} href={href} onClick={() => setSidebarOpen(false)}
-                className={`sidebar-link ${isActive ? "active" : ""}`}
-                style={{ fontSize: "0.72rem" }}>
-                <Icon style={{ width: 14, height: 14 }} />
-                {label}
-              </Link>
-            );
-          })}
+          <Link href="/settings" onClick={() => setSidebarOpen(false)}
+            className={`sidebar-link ${pathname.startsWith("/settings") ? "active" : ""}`}
+            style={{ fontSize: "0.72rem" }}>
+            <Settings style={{ width: 14, height: 14 }} />
+            Settings &amp; Profile
+          </Link>
         </div>
 
         {/* ── User footer ───────────────────────────────── */}
