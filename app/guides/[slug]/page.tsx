@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getGuideBySlug, getAllGuides } from "@/lib/data/guides/index";
+import { getStepById } from "@/lib/data/checklist";
 import type { Guide } from "@/lib/data/guides/types";
 
 const PHASE_COLORS: Record<number, string> = {
@@ -47,8 +48,41 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
     .map((s) => allGuides.find((g) => g.slug === s))
     .filter(Boolean) as Guide[];
 
+  // Build JSON-LD schema
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": guide.title,
+    "description": guide.metaDescription,
+    "datePublished": guide.publishedAt,
+    "dateModified": guide.publishedAt,
+    "author": { "@type": "Organization", "name": "LaunchAdvisor", "url": "https://launchadvisor.co" },
+    "publisher": { "@type": "Organization", "name": "LaunchAdvisor", "url": "https://launchadvisor.co" },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://launchadvisor.co/guides/${guide.slug}` },
+    "keywords": [guide.primaryKeyword, ...guide.secondaryKeywords].join(", "),
+  };
+
+  const faqSchema = guide.faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": guide.faqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
+    })),
+  } : null;
+
+  // Lookup step titles for checklist links
+  const checklistStepDetails = guide.checklistStepIds
+    .map((id) => ({ id, step: getStepById(id) }))
+    .filter((x) => x.step !== undefined) as { id: string; step: NonNullable<ReturnType<typeof getStepById>> }[];
+
   return (
     <article style={{ maxWidth: 760, margin: "0 auto", padding: "48px 24px 80px" }}>
+
+      {/* JSON-LD Schema */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
 
       {/* Breadcrumb */}
       <nav style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 32, flexWrap: "wrap" }}>
@@ -200,16 +234,27 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
       )}
 
       {/* Checklist step links */}
-      {guide.checklistStepIds.length > 0 && (
+      {checklistStepDetails.length > 0 && (
         <div style={{ background: `${color}10`, border: `2px solid ${color}33`, padding: "24px", marginBottom: 48 }}>
           <p style={{ fontFamily: "var(--font-display)", fontSize: "0.7rem", letterSpacing: "0.2em", color, marginBottom: 12, textTransform: "uppercase" }}>
-            Checklist Steps in This Guide
+            Apply This in Your Checklist
           </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {guide.checklistStepIds.map((id) => (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {checklistStepDetails.map(({ id, step }) => (
               <Link key={id} href={`/checklist/${id}`}
-                style={{ fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600, color, border: `1px solid ${color}55`, padding: "5px 12px", textDecoration: "none", letterSpacing: "0.04em" }}>
-                {id} →
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+                  fontFamily: "var(--font-heading)", fontSize: "0.82rem", fontWeight: 600,
+                  color: "var(--navy)", border: `1px solid ${color}44`, padding: "10px 16px",
+                  textDecoration: "none", background: "var(--surface)", transition: "border-color 0.15s",
+                }}>
+                <span>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "0.6rem", color, letterSpacing: "0.12em", marginRight: 8 }}>
+                    {`Phase ${step.phase}.${step.order}`}
+                  </span>
+                  {step.title}
+                </span>
+                <span style={{ color, opacity: 0.7, flexShrink: 0 }}>→</span>
               </Link>
             ))}
           </div>

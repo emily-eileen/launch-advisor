@@ -64,6 +64,7 @@ function SaveProgressModal({ onClose }: { onClose: () => void }) {
 export default function ChecklistPage() {
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [emailSaved, setEmailSaved] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -71,11 +72,8 @@ export default function ChecklistPage() {
     const completedSet = savedProgress ? new Set<string>(JSON.parse(savedProgress)) : new Set<string>();
     setCompleted(completedSet);
 
-    const alreadyPrompted = localStorage.getItem("launchadvisor_email_prompted");
-    if (completedSet.has("validate-1") && !alreadyPrompted) {
-      const emailSaved = localStorage.getItem("launchadvisor_email");
-      if (!emailSaved) setShowSaveModal(true);
-    }
+    const email = localStorage.getItem("launchadvisor_email");
+    setEmailSaved(!!email);
 
     setHydrated(true);
   }, []);
@@ -98,6 +96,7 @@ export default function ChecklistPage() {
         <SaveProgressModal onClose={() => {
           setShowSaveModal(false);
           localStorage.setItem("launchadvisor_email_prompted", "true");
+          setEmailSaved(!!localStorage.getItem("launchadvisor_email"));
         }} />
       )}
 
@@ -113,6 +112,31 @@ export default function ChecklistPage() {
           LAUNCH CHECKLIST
         </h1>
       </div>
+
+      {/* ── Email capture banner (shown until email is saved) ─ */}
+      {!emailSaved && (
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          gap: 16, padding: "14px 20px", flexWrap: "wrap",
+          background: "var(--navy)", borderLeft: "4px solid var(--orange)",
+        }}>
+          <div>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: "0.75rem", letterSpacing: "0.12em", color: "white", marginBottom: 2 }}>
+              SAVE YOUR PROGRESS
+            </p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.55)" }}>
+              Your checklist lives in your browser. Get a link so you never lose it.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowSaveModal(true)}
+            className="btn btn-primary"
+            style={{ fontSize: "0.72rem", padding: "8px 18px", flexShrink: 0 }}
+          >
+            Save for free →
+          </button>
+        </div>
+      )}
 
       {/* ── Overall Progress ───────────────────────────────── */}
       <div className="panel" style={{ padding: 20 }}>

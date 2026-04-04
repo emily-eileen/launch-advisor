@@ -184,7 +184,7 @@ export const guides: Guide[] = [
 
   // ── 4. Zapier vs Make vs n8n ──────────────────────────────────────────────
   {
-    slug: "zapier-vs-make-vs-n8n",
+    slug: "zapier-vs-make-vs-n8n-for-operations",
     phase: 10,
     phaseName: "Operate",
     title: "Zapier vs Make vs n8n: Best Automation Tool for Small Business",
@@ -1050,7 +1050,7 @@ export const guides: Guide[] = [
 
   // ── 19. QuickBooks vs FreshBooks vs Wave ──────────────────────────────────
   {
-    slug: "quickbooks-vs-freshbooks-vs-wave",
+    slug: "quickbooks-vs-freshbooks-vs-wave-for-operations",
     phase: 10,
     phaseName: "Operate",
     title: "QuickBooks vs FreshBooks vs Wave: Best Accounting Software for Small Business",

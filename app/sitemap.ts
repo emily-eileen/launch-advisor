@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllGuides } from "@/lib/data/guides/index";
-import { checklistSteps } from "@/lib/data/checklist";
+import { checklistSteps, phases } from "@/lib/data/checklist";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://launchadvisor.co";
@@ -13,6 +13,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${base}/resources`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
   ];
+
+  const phasePages: MetadataRoute.Sitemap = phases.map((p) => ({
+    url: `${base}/checklist/phase/${p.number}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
 
   const checklistPages: MetadataRoute.Sitemap = checklistSteps.map((step) => ({
     url: `${base}/checklist/${step.id}`,
@@ -29,5 +36,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...checklistPages, ...guidePages];
+  return [...staticPages, ...phasePages, ...checklistPages, ...guidePages];
 }

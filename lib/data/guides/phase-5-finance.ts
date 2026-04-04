@@ -236,7 +236,7 @@ export const guides: Guide[] = [
 
   // ── GUIDE 5 ──────────────────────────────────────────────────────────────
   {
-    slug: "stripe-vs-paypal-vs-square",
+    slug: "stripe-vs-paypal-vs-square-payment-processing",
     phase: 5,
     phaseName: "Finance",
     title: "Stripe vs PayPal vs Square: Best Payment Processing for Small Business",
