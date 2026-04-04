@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
-  Settings, LogOut, Menu, X, Plus, ChevronDown, Rocket,
+  Settings, LogOut, Menu, X, Plus, ChevronDown, Rocket, BookOpen,
 } from "lucide-react";
 import { phases, checklistSteps } from "@/lib/data/checklist";
 
@@ -16,7 +16,7 @@ const MOCK_BUSINESSES = [
   { id: "2", name: "Consulting Co",  type: "Services" },
 ];
 
-const PUBLIC_PATHS = ["/checklist", "/resources"];
+const PUBLIC_PATHS = ["/checklist", "/resources", "/guides"];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser]             = useState<{ email?: string; id?: string } | null>(null);
@@ -235,6 +235,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* ── Secondary links ───────────────────────────── */}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", padding: "6px 0" }}>
+          <Link href="/guides" onClick={() => setSidebarOpen(false)}
+            className={`sidebar-link ${pathname.startsWith("/guides") ? "active" : ""}`}
+            style={{ fontSize: "0.72rem" }}>
+            <BookOpen style={{ width: 14, height: 14 }} />
+            Guides &amp; Articles
+          </Link>
           <Link href="/settings" onClick={() => setSidebarOpen(false)}
             className={`sidebar-link ${pathname.startsWith("/settings") ? "active" : ""}`}
             style={{ fontSize: "0.72rem" }}>

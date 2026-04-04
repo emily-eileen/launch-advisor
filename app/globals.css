@@ -28,12 +28,16 @@
   --danger: #DC2626;
 
   /* Phase colors */
-  --phase-1: #F97316; /* Decide - orange */
-  --phase-2: #8B5CF6; /* Form - purple */
-  --phase-3: #16A34A; /* Money - green */
-  --phase-4: #0EA5E9; /* Brand - blue */
-  --phase-5: #EF4444; /* Protect - red */
-  --phase-6: #F59E0B; /* Launch - amber */
+  --phase-1: #F97316; /* Validate - orange */
+  --phase-2: #8B5CF6; /* Build - purple */
+  --phase-3: #16A34A; /* Price - green */
+  --phase-4: #0EA5E9; /* Form - blue */
+  --phase-5: #EF4444; /* Finance - red */
+  --phase-6: #F59E0B; /* Locate - amber */
+  --phase-7: #EC4899; /* Brand - pink */
+  --phase-8: #06B6D4; /* Protect - cyan */
+  --phase-9: #A855F7; /* Sell - violet */
+  --phase-10: #14B8A6; /* Operate - teal */
 
   /* Typography */
   --font-display: var(--font-bebas-neue), "Bebas Neue", sans-serif;
@@ -360,6 +364,18 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
   padding: 1px 6px;
   text-transform: uppercase;
+}
+
+/* ─── Guide Cards ────────────────────────────────────── */
+.guide-card:hover {
+  border-color: var(--orange);
+  box-shadow: 3px 3px 0 var(--orange);
+  transform: translate(-1px, -1px);
+}
+
+.guide-resource-link:hover {
+  border-color: var(--orange);
+  box-shadow: 3px 3px 0 var(--orange);
 }
 
 /* ─── Journal Card ───────────────────────────────────── */

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { getStepById, getAdjacentSteps } from "@/lib/data/checklist";
 
-const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B"];
+const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899", "#06B6D4", "#A855F7", "#14B8A6"];
 
 export default function StepDetailPage() {
   const params = useParams();
