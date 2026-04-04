@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { CheckCircle2, ChevronDown, ChevronRight, ArrowRight, Zap, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, ArrowRight, Zap, X, ExternalLink } from "lucide-react";
 import { phases, checklistSteps } from "@/lib/data/checklist";
 
 const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899", "#06B6D4", "#A855F7", "#14B8A6"];
@@ -183,7 +183,7 @@ export default function ChecklistPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
           <div style={{ height: 1, width: 32, background: "var(--orange)" }} />
           <span style={{ fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-muted)" }}>
-            {totalSteps} steps · 6 phases
+            {totalSteps} steps · 10 phases
           </span>
         </div>
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: "3rem", letterSpacing: "0.02em", color: "var(--navy)", lineHeight: 1 }}>
@@ -289,7 +289,7 @@ export default function ChecklistPage() {
                 </div>
               </button>
 
-              {/* Steps list */}
+              {/* Steps list — each step is a full-page link, no inline expansion */}
               {isExpanded && (
                 <div style={{ borderTop: "1px solid var(--border-light)" }}>
                   {phaseSteps.map((step, idx) => {
@@ -302,15 +302,16 @@ export default function ChecklistPage() {
                         key={step.id}
                         style={{
                           display: "flex", alignItems: "center", gap: 14,
-                          padding: "14px 20px 14px 24px",
+                          padding: "12px 20px 12px 24px",
                           borderBottom: isLast ? "none" : "1px solid var(--border-light)",
                           background: isDoneStep ? "rgba(249,115,22,0.03)" : "transparent",
                           transition: "background 0.1s",
                         }}
+                        className="step-item"
                       >
-                        {/* Checkbox — toggles on click */}
+                        {/* Checkbox — only interactive element that doesn't navigate */}
                         <button
-                          onClick={() => toggleStep(step.id)}
+                          onClick={(e) => { e.stopPropagation(); toggleStep(step.id); }}
                           className={`step-checkbox ${isDoneStep ? "checked" : ""}`}
                           style={{ flexShrink: 0 }}
                         >
@@ -318,29 +319,23 @@ export default function ChecklistPage() {
                         </button>
 
                         {/* Step number */}
-                        <span style={{ fontFamily: "var(--font-display)", fontSize: "0.75rem", letterSpacing: "0.1em", color: isDoneStep ? color : "var(--ink-muted)", minWidth: 28, flexShrink: 0 }}>
+                        <span style={{ fontFamily: "var(--font-display)", fontSize: "0.72rem", letterSpacing: "0.1em", color: isDoneStep ? color : "var(--ink-muted)", minWidth: 28, flexShrink: 0 }}>
                           {stepNum}
                         </span>
 
-                        {/* Content — links to detail page */}
-                        <Link href={`/checklist/${step.id}`} style={{ flex: 1, minWidth: 0, textDecoration: "none" }}>
-                          <p style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", fontWeight: 600, color: isDoneStep ? "var(--ink-muted)" : "var(--navy)", textDecoration: isDoneStep ? "line-through" : "none", marginBottom: 2 }}>
+                        {/* Title row — full link to step page */}
+                        <Link href={`/checklist/${step.id}`} style={{ flex: 1, minWidth: 0, textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                          <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", fontWeight: 600, color: isDoneStep ? "var(--ink-muted)" : "var(--navy)", textDecoration: isDoneStep ? "line-through" : "none" }}>
                             {step.title}
-                          </p>
-                          <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "var(--ink-muted)", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {step.description}
-                          </p>
-                        </Link>
-
-                        {/* Resource count */}
-                        {step.resources.length > 0 && (
-                          <div style={{ fontFamily: "var(--font-display)", fontSize: "0.58rem", letterSpacing: "0.1em", textTransform: "uppercase", color: step.resources.some(r => r.affiliate) ? "var(--orange)" : "var(--ink-muted)", border: `1px solid ${step.resources.some(r => r.affiliate) ? "var(--orange)" : "var(--border-light)"}`, padding: "1px 5px", flexShrink: 0 }}>
-                            {step.resources.length} tool{step.resources.length !== 1 ? "s" : ""}
+                          </span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                            {step.resources.some(r => r.affiliate) && (
+                              <span style={{ fontFamily: "var(--font-display)", fontSize: "0.55rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--orange)", border: "1px solid var(--orange)", padding: "1px 5px" }}>
+                                Tools
+                              </span>
+                            )}
+                            <ArrowRight style={{ width: 13, height: 13, color: isDoneStep ? "var(--ink-muted)" : color, opacity: 0.6 }} />
                           </div>
-                        )}
-
-                        <Link href={`/checklist/${step.id}`} style={{ color: "var(--ink-muted)", flexShrink: 0, opacity: 0.5 }}>
-                          <ArrowRight style={{ width: 14, height: 14 }} />
                         </Link>
                       </div>
                     );
