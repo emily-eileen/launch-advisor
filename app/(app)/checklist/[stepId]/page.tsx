@@ -5,151 +5,13 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, ExternalLink,
-  BookOpen, Loader2, Zap, ChevronDown, HelpCircle,
+  BookOpen, Loader2, Zap, FileText,
 } from "lucide-react";
 import { getStepById, getAdjacentSteps } from "@/lib/data/checklist";
 import { getGuidesForStep } from "@/lib/data/guides/index";
 import type { Guide } from "@/lib/data/guides/types";
 
 const PHASE_COLORS = ["#F97316", "#8B5CF6", "#16A34A", "#0EA5E9", "#EF4444", "#F59E0B", "#EC4899", "#06B6D4", "#A855F7", "#14B8A6"];
-
-function FaqArticle({ guide, color }: { guide: Guide; color: string }) {
-  const [open, setOpen] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  return (
-    <div style={{ border: "1px solid var(--border-light)", background: "var(--surface)" }}>
-      {/* Article header — always visible */}
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-          gap: 12, padding: "14px 16px", background: "transparent", cursor: "pointer",
-          borderBottom: open ? "1px solid var(--border-light)" : "none", textAlign: "left",
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{
-            fontFamily: "var(--font-heading)", fontSize: "0.88rem", fontWeight: 700,
-            color: "var(--navy)", lineHeight: 1.3, marginBottom: 2,
-          }}>
-            {guide.title}
-          </p>
-          {!open && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "var(--ink-muted)", lineHeight: 1.4 }}>
-              {guide.intro.slice(0, 110)}{guide.intro.length > 110 ? "…" : ""}
-            </p>
-          )}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <span style={{
-            fontFamily: "var(--font-display)", fontSize: "0.6rem", letterSpacing: "0.15em",
-            color: "var(--ink-muted)", textTransform: "uppercase",
-          }}>
-            {guide.readTime} min
-          </span>
-          <ChevronDown style={{
-            width: 14, height: 14, color: "var(--ink-muted)",
-            transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s",
-          }} />
-        </div>
-      </button>
-
-      {/* Expanded content */}
-      {open && (
-        <div style={{ padding: "16px 16px 20px" }}>
-          {/* Intro */}
-          <p style={{
-            fontFamily: "var(--font-body)", fontSize: "0.88rem", color: "var(--ink-mid)",
-            lineHeight: 1.65, marginBottom: 20,
-            borderLeft: `3px solid ${color}`, paddingLeft: 12,
-          }}>
-            {guide.intro}
-          </p>
-
-          {/* FAQs */}
-          {guide.faqs.length > 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {guide.faqs.map((faq, i) => (
-                <div key={i} style={{ borderTop: "1px solid var(--border-light)" }}>
-                  <button
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    style={{
-                      width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-                      gap: 10, padding: "12px 0", background: "transparent", cursor: "pointer", textAlign: "left",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8, flex: 1 }}>
-                      <HelpCircle style={{ width: 13, height: 13, color, flexShrink: 0, marginTop: 2 }} />
-                      <span style={{
-                        fontFamily: "var(--font-heading)", fontSize: "0.83rem", fontWeight: 700,
-                        color: openFaq === i ? color : "var(--navy)", lineHeight: 1.3, transition: "color 0.15s",
-                      }}>
-                        {faq.question}
-                      </span>
-                    </div>
-                    <ChevronDown style={{
-                      width: 13, height: 13, color: "var(--ink-muted)", flexShrink: 0,
-                      transform: openFaq === i ? "rotate(180deg)" : "none", transition: "transform 0.2s",
-                    }} />
-                  </button>
-                  {openFaq === i && (
-                    <p style={{
-                      fontFamily: "var(--font-body)", fontSize: "0.83rem", color: "var(--ink-mid)",
-                      lineHeight: 1.6, paddingBottom: 14, paddingLeft: 21,
-                    }}>
-                      {faq.answer}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Affiliate tools */}
-          {guide.affiliates.length > 0 && (
-            <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border-light)" }}>
-              <p style={{
-                fontFamily: "var(--font-display)", fontSize: "0.58rem", letterSpacing: "0.2em",
-                textTransform: "uppercase", color: "var(--ink-muted)", marginBottom: 10,
-              }}>
-                Recommended tools
-              </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {guide.affiliates.slice(0, 4).map((aff, i) => (
-                  <a
-                    key={i}
-                    href={aff.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: 6,
-                      fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600,
-                      color: "var(--navy)", textDecoration: "none",
-                      border: "1.5px solid var(--border-light)", padding: "5px 10px",
-                      background: "var(--surface-warm)", transition: "all 0.15s",
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = color; (e.currentTarget as HTMLElement).style.color = color; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border-light)"; (e.currentTarget as HTMLElement).style.color = "var(--navy)"; }}
-                  >
-                    {aff.name}
-                    {aff.badge && (
-                      <span style={{
-                        fontFamily: "var(--font-display)", fontSize: "0.55rem", letterSpacing: "0.12em",
-                        background: color, color: "white", padding: "1px 5px",
-                      }}>{aff.badge}</span>
-                    )}
-                    <ExternalLink style={{ width: 10, height: 10, opacity: 0.5 }} />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function StepDetailPage() {
   const params = useParams();
@@ -164,8 +26,13 @@ export default function StepDetailPage() {
   const [relatedGuides, setRelatedGuides] = useState<Guide[]>([]);
 
   useEffect(() => {
-    getGuidesForStep(stepId).then(setRelatedGuides).catch(() => {});
-  }, [stepId]);
+    const savedProgress = localStorage.getItem("launchadvisor_progress");
+    if (savedProgress) {
+      const set = new Set<string>(JSON.parse(savedProgress));
+      if (step) setIsDone(set.has(step.id));
+    }
+    if (step) getGuidesForStep(step.id).then(setRelatedGuides).catch(() => {});
+  }, [stepId, step]);
 
   if (!step) {
     return (
@@ -182,8 +49,14 @@ export default function StepDetailPage() {
 
   const color = PHASE_COLORS[step.phase - 1];
 
-  async function handleToggleDone() {
-    setIsDone(!isDone);
+  function handleToggleDone() {
+    if (!step) return;
+    const newState = !isDone;
+    setIsDone(newState);
+    const raw = localStorage.getItem("launchadvisor_progress");
+    const set = raw ? new Set<string>(JSON.parse(raw)) : new Set<string>();
+    newState ? set.add(step.id) : set.delete(step.id);
+    localStorage.setItem("launchadvisor_progress", JSON.stringify(Array.from(set)));
   }
 
   async function handleSaveJournal() {
@@ -198,29 +71,22 @@ export default function StepDetailPage() {
   return (
     <div style={{ maxWidth: 680, display: "flex", flexDirection: "column", gap: 20 }}>
 
-      {/* ── Back link ─────────────────────────────────────── */}
-      <Link href="/checklist" style={{
-        display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
-        fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 600,
+      {/* ── Breadcrumb ────────────────────────────────────── */}
+      <Link href={`/checklist/phase/${step.phase}`} style={{
+        display: "inline-flex", alignItems: "center", gap: 5, textDecoration: "none",
+        fontFamily: "var(--font-heading)", fontSize: "0.72rem", fontWeight: 600,
         letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--ink-muted)",
       }}>
-        <ArrowLeft style={{ width: 13, height: 13 }} />
-        All phases
+        <ArrowLeft style={{ width: 12, height: 12 }} />
+        Phase {step.phase}: {step.phaseName}
       </Link>
 
-      {/* ── Phase badge + step info ───────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      {/* ── Step label ────────────────────────────────────── */}
+      <div>
         <span style={{
-          fontFamily: "var(--font-display)", fontSize: "0.65rem", letterSpacing: "0.18em",
-          textTransform: "uppercase", padding: "3px 10px", border: `2px solid ${color}`, color,
+          fontFamily: "var(--font-heading)", fontSize: "0.68rem", fontWeight: 600, color: "var(--ink-muted)",
         }}>
-          Phase {step.phase}: {step.phaseName}
-        </span>
-        <span style={{
-          fontFamily: "var(--font-heading)", fontSize: "0.68rem", fontWeight: 600,
-          color: "var(--ink-muted)",
-        }}>
-          Step {step.order} of 5
+          Step {step.phase}.{step.order}
         </span>
       </div>
 
@@ -253,7 +119,6 @@ export default function StepDetailPage() {
           {step.description}
         </p>
 
-        {/* Action box */}
         <div style={{
           background: "rgba(249,115,22,0.06)", border: "2px solid rgba(249,115,22,0.2)",
           padding: "14px 16px",
@@ -273,7 +138,7 @@ export default function StepDetailPage() {
         </div>
       </div>
 
-      {/* ── Resources ─────────────────────────────────────── */}
+      {/* ── Tools & Resources ─────────────────────────────── */}
       {step.resources.length > 0 && (
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
@@ -282,7 +147,7 @@ export default function StepDetailPage() {
               fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em",
               textTransform: "uppercase", color: "var(--ink-muted)",
             }}>
-              Tools & Resources
+              Tools &amp; Resources
             </span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -307,8 +172,15 @@ export default function StepDetailPage() {
                     <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", fontWeight: 700, color: "var(--navy)" }}>
                       {resource.name}
                     </span>
-                    {resource.affiliate && (
-                      <span className="affiliate-badge">Partner</span>
+                    {resource.badge && (
+                      <span style={{
+                        fontFamily: "var(--font-display)", fontSize: "0.55rem", letterSpacing: "0.12em",
+                        textTransform: "uppercase", padding: "1px 6px",
+                        background: resource.affiliate ? "var(--orange)" : "var(--border-light)",
+                        color: resource.affiliate ? "white" : "var(--ink-muted)",
+                      }}>
+                        {resource.badge}
+                      </span>
                     )}
                   </div>
                   {resource.description && (
@@ -324,7 +196,7 @@ export default function StepDetailPage() {
         </div>
       )}
 
-      {/* ── FAQ Articles ──────────────────────────────────── */}
+      {/* ── Go deeper: guide articles ─────────────────────── */}
       {relatedGuides.length > 0 && (
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
@@ -333,12 +205,49 @@ export default function StepDetailPage() {
               fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.22em",
               textTransform: "uppercase", color: "var(--ink-muted)",
             }}>
-              Common Questions
+              Go deeper
             </span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {relatedGuides.map((guide) => (
-              <FaqArticle key={guide.slug} guide={guide} color={color} />
+              <Link key={guide.slug} href={`/guides/${guide.slug}`} style={{ textDecoration: "none" }}>
+                <div
+                  className="panel"
+                  style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", transition: "all 0.12s" }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.borderLeftColor = color;
+                    (e.currentTarget as HTMLElement).style.transform = "translateX(2px)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.borderLeftColor = "";
+                    (e.currentTarget as HTMLElement).style.transform = "";
+                  }}
+                >
+                  <FileText style={{ width: 16, height: 16, color, flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{
+                      fontFamily: "var(--font-heading)", fontSize: "0.88rem", fontWeight: 700,
+                      color: "var(--navy)", lineHeight: 1.3, marginBottom: 2,
+                    }}>
+                      {guide.title}
+                    </p>
+                    <p style={{
+                      fontFamily: "var(--font-body)", fontSize: "0.74rem", color: "var(--ink-muted)", lineHeight: 1.4, margin: 0,
+                    }}>
+                      {guide.intro.slice(0, 100)}{guide.intro.length > 100 ? "…" : ""}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                    <span style={{
+                      fontFamily: "var(--font-display)", fontSize: "0.58rem", letterSpacing: "0.12em",
+                      textTransform: "uppercase", color: "var(--ink-muted)",
+                    }}>
+                      {guide.readTime} min
+                    </span>
+                    <ArrowRight style={{ width: 13, height: 13, color, opacity: 0.7 }} />
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -401,8 +310,8 @@ export default function StepDetailPage() {
             Next step <ArrowRight style={{ width: 13, height: 13 }} />
           </Link>
         ) : (
-          <Link href="/checklist" className="btn btn-primary" style={{ fontSize: "0.72rem", padding: "8px 16px" }}>
-            All done! <CheckCircle2 style={{ width: 13, height: 13 }} />
+          <Link href={`/checklist/phase/${step.phase}`} className="btn btn-primary" style={{ fontSize: "0.72rem", padding: "8px 16px" }}>
+            Phase complete <CheckCircle2 style={{ width: 13, height: 13 }} />
           </Link>
         )}
       </div>
