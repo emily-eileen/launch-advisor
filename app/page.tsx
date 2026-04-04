@@ -1,15 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Zap, Shield, Users, Star } from "lucide-react";
+import { ArrowRight, CheckCircle2, Zap, Shield, BookOpen, TrendingUp, Star } from "lucide-react";
 
 const PHASES = [
-  { num: "01", name: "Decide", color: "#F97316", desc: "Validate your idea before spending a dime." },
-  { num: "02", name: "Form", color: "#8B5CF6", desc: "Register legally, get your EIN, stay protected." },
-  { num: "03", name: "Money", color: "#16A34A", desc: "Open banking, set up accounting and payments." },
-  { num: "04", name: "Brand", color: "#0EA5E9", desc: "Build your online presence that converts." },
-  { num: "05", name: "Protect", color: "#EF4444", desc: "Insurance, contracts, IP — cover your bases." },
-  { num: "06", name: "Launch", color: "#F59E0B", desc: "Go live, get your first customer, iterate." },
+  { num: "01", name: "Validate",  color: "#F97316", desc: "Prove your idea before spending a dollar. Talk to customers, run demand tests, define your niche." },
+  { num: "02", name: "Build",     color: "#8B5CF6", desc: "Create your MVP — product, service, or storefront. Ship the minimum that earns the first dollar." },
+  { num: "03", name: "Price",     color: "#16A34A", desc: "Set pricing that covers costs and signals value. Model your unit economics from day one." },
+  { num: "04", name: "Form",      color: "#0EA5E9", desc: "Register your entity, get your EIN, open your bank account, set up payroll." },
+  { num: "05", name: "Finance",   color: "#EF4444", desc: "Get funded, set up bookkeeping, and build the financial systems to stay solvent." },
+  { num: "06", name: "Locate",    color: "#F59E0B", desc: "Find your space — storefront, virtual office, or home-based setup. Set up your address and ops stack." },
+  { num: "07", name: "Brand",     color: "#EC4899", desc: "Name, logo, website, social presence. Build the identity that earns trust on first contact." },
+  { num: "08", name: "Protect",   color: "#06B6D4", desc: "Business insurance, contracts, IP, and compliance. Cover the bases that sink unprepared founders." },
+  { num: "09", name: "Sell",      color: "#A855F7", desc: "Build your sales system — CRM, pipeline, outreach, and your first repeatable acquisition channel." },
+  { num: "10", name: "Operate",   color: "#14B8A6", desc: "Set up team, tools, SOPs, and reporting. Run like a real business from the first week." },
 ];
 
 const TESTIMONIALS = [
@@ -19,10 +23,17 @@ const TESTIMONIALS = [
 ];
 
 const STATS = [
-  { value: "30", label: "Proven steps" },
-  { value: "6", label: "Launch phases" },
-  { value: "50+", label: "Vetted tools" },
+  { value: "55", label: "Proven steps" },
+  { value: "10", label: "Launch phases" },
+  { value: "200+", label: "Launch guides" },
   { value: "100%", label: "Free to start" },
+];
+
+const GUIDE_TOPICS = [
+  { phase: "Validate", color: "#F97316", guides: ["How to Validate a Business Idea", "Market Research on a Shoestring", "Lean MVP Testing Methods"] },
+  { phase: "Form",     color: "#0EA5E9", guides: ["LLC vs S-Corp: Which Is Right for You?", "How to Get an EIN in 10 Minutes", "Opening a Business Bank Account"] },
+  { phase: "Finance",  color: "#EF4444", guides: ["Best Business Credit Cards for Startups", "Small Business Bookkeeping Setup", "How to Apply for an SBA Loan"] },
+  { phase: "Brand",    color: "#EC4899", guides: ["Building a Brand Identity on a Budget", "How to Register a Domain Name", "The Website Launch Checklist"] },
 ];
 
 export default function LandingPage() {
@@ -35,8 +46,18 @@ export default function LandingPage() {
           <span style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", letterSpacing: "0.05em", color: "var(--navy)" }}>
             LAUNCH<span style={{ color: "var(--orange)" }}>ADVISOR</span>
           </span>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <Link href="/login" style={{ fontFamily: "var(--font-heading)", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)", padding: "8px 14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <Link href="/checklist" style={{ fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)", padding: "8px 14px" }}>
+              Checklist
+            </Link>
+            <Link href="/guides" style={{ fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)", padding: "8px 14px" }}>
+              Guides
+            </Link>
+            <Link href="/resources" style={{ fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)", padding: "8px 14px" }}>
+              Resources
+            </Link>
+            <div style={{ width: 1, height: 20, background: "var(--border-light)", margin: "0 8px" }} />
+            <Link href="/login" style={{ fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)", padding: "8px 14px" }}>
               Sign in
             </Link>
             <Link href="/quiz" className="btn btn-primary" style={{ fontSize: "0.75rem", padding: "9px 18px" }}>
@@ -57,7 +78,7 @@ export default function LandingPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
               <div style={{ height: 1, width: 40, background: "var(--orange)" }} />
               <span style={{ fontFamily: "var(--font-display)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
-                The business launch OS
+                Zero to launch — the complete OS
               </span>
             </div>
 
@@ -68,12 +89,12 @@ export default function LandingPage() {
             </h1>
 
             <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.6)", fontSize: "1.1rem", lineHeight: 1.7, marginBottom: 36, maxWidth: 460 }}>
-              The exact 30-step playbook to go from idea to open for business — with the right tools at every step.
+              The exact 55-step playbook to go from idea to open for business — 10 phases, every tool curated, zero guesswork.
             </p>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginBottom: 36 }}>
-              <Link href="/quiz" className="btn btn-primary" style={{ fontSize: "0.82rem", padding: "12px 28px" }}>
-                See my personalized plan <ArrowRight style={{ width: 16, height: 16 }} />
+              <Link href="/checklist" className="btn btn-primary" style={{ fontSize: "0.82rem", padding: "12px 28px" }}>
+                Open the free checklist <ArrowRight style={{ width: 16, height: 16 }} />
               </Link>
               <a href="#how-it-works" style={{ fontFamily: "var(--font-heading)", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", padding: "12px 20px", border: "2px solid rgba(255,255,255,0.15)", display: "inline-flex", alignItems: "center", gap: 8 }}>
                 See how it works
@@ -103,7 +124,7 @@ export default function LandingPage() {
               <div style={{ borderBottom: "2px solid var(--border)", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--surface-warm)" }}>
                 <div>
                   <p style={{ fontFamily: "var(--font-display)", fontSize: "0.62rem", letterSpacing: "0.25em", color: "var(--ink-muted)", textTransform: "uppercase" }}>Your launch checklist</p>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", letterSpacing: "0.03em", color: "var(--navy)", lineHeight: 1.2 }}>PHASE 1 — DECIDE</p>
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", letterSpacing: "0.03em", color: "var(--navy)", lineHeight: 1.2 }}>PHASE 1 — VALIDATE</p>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <span style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "var(--orange)" }}>4/5</span>
@@ -164,36 +185,89 @@ export default function LandingPage() {
       </section>
 
       {/* ── Phases ───────────────────────────────────────── */}
-      <section id="how-it-works" style={{ padding: "72px 0", maxWidth: 1200, margin: "0 auto", paddingLeft: 24, paddingRight: 24 }}>
+      <section id="how-it-works" style={{ padding: "72px 24px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 12 }}>
           <div style={{ height: 1, width: 40, background: "var(--orange)" }} />
           <span style={{ fontFamily: "var(--font-display)", fontSize: "0.68rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-muted)" }}>The system</span>
         </div>
-        <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.5rem,5vw,4rem)", letterSpacing: "0.02em", color: "var(--navy)", lineHeight: 1, marginBottom: 40 }}>
-          6 PHASES. 30 STEPS.<br />ZERO GUESSWORK.
+        <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.5rem,5vw,4rem)", letterSpacing: "0.02em", color: "var(--navy)", lineHeight: 1, marginBottom: 12 }}>
+          10 PHASES. 55 STEPS.<br />ZERO GUESSWORK.
         </h2>
+        <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-muted)", fontSize: "1rem", marginBottom: 40, maxWidth: 600 }}>
+          Every phase unlocks the next. Complete them in order or jump to where you are — your progress is tracked automatically.
+        </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
           {PHASES.map((phase) => (
-            <div key={phase.num} className="panel" style={{ cursor: "default", transition: "box-shadow 0.2s" }}
-              onMouseEnter={e => (e.currentTarget.style.boxShadow = "4px 4px 0 var(--orange)")}
-              onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
-              <div style={{ padding: 20 }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: "3.5rem", color: phase.color, lineHeight: 1, opacity: 0.2 }}>{phase.num}</span>
-                  <span className="phase-badge" style={{ color: phase.color, borderColor: phase.color }}>Phase {phase.num}</span>
+            <Link key={phase.num} href={`/checklist#phase-${parseInt(phase.num)}`}
+              className="panel"
+              style={{ textDecoration: "none", display: "block", transition: "box-shadow 0.15s, transform 0.15s" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = `4px 4px 0 ${phase.color}`; (e.currentTarget as HTMLElement).style.transform = "translate(-2px,-2px)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; (e.currentTarget as HTMLElement).style.transform = "none"; }}>
+              <div style={{ padding: "16px 16px 12px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "2.8rem", color: phase.color, lineHeight: 1, opacity: 0.18 }}>{phase.num}</span>
+                  <span className="phase-badge" style={{ color: phase.color, borderColor: phase.color, fontSize: "0.58rem" }}>Phase {parseInt(phase.num)}</span>
                 </div>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", letterSpacing: "0.03em", color: "var(--navy)", lineHeight: 1 }}>{phase.name.toUpperCase()}</h3>
-                <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-muted)", fontSize: "0.88rem", marginTop: 8 }}>{phase.desc}</p>
+                <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", letterSpacing: "0.03em", color: "var(--navy)", lineHeight: 1, marginBottom: 8 }}>{phase.name.toUpperCase()}</h3>
+                <p style={{ fontFamily: "var(--font-body)", color: "var(--ink-muted)", fontSize: "0.78rem", lineHeight: 1.5 }}>{phase.desc}</p>
               </div>
-              <div style={{ height: 6, background: `repeating-linear-gradient(-45deg, ${phase.color}, ${phase.color} 3px, transparent 3px, transparent 10px)` }} />
-            </div>
+              <div style={{ height: 4, background: `repeating-linear-gradient(-45deg, ${phase.color}, ${phase.color} 3px, transparent 3px, transparent 10px)` }} />
+            </Link>
           ))}
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 32 }}>
+          <Link href="/checklist" className="btn btn-secondary" style={{ fontSize: "0.8rem", padding: "12px 32px" }}>
+            Open the full 55-step checklist <ArrowRight style={{ width: 15, height: 15 }} />
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Guides ───────────────────────────────────────── */}
+      <section style={{ padding: "72px 24px", background: "var(--navy-light)", borderTop: "2px solid var(--border)", borderBottom: "2px solid var(--border)" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, flexWrap: "wrap", gap: 16 }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 12 }}>
+                <div style={{ height: 1, width: 40, background: "var(--orange)" }} />
+                <span style={{ fontFamily: "var(--font-display)", fontSize: "0.68rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-muted)" }}>200+ free guides</span>
+              </div>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem,4vw,3.5rem)", color: "var(--navy)", letterSpacing: "0.02em", lineHeight: 1 }}>
+                EVERY ANSWER.<br />ONE PLACE.
+              </h2>
+            </div>
+            <Link href="/guides" className="btn btn-secondary" style={{ fontSize: "0.78rem", padding: "10px 24px", flexShrink: 0 }}>
+              Browse all guides <BookOpen style={{ width: 14, height: 14 }} />
+            </Link>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+            {GUIDE_TOPICS.map((topic) => (
+              <div key={topic.phase} className="panel" style={{ background: "var(--surface)" }}>
+                <div style={{ padding: "14px 16px 12px", borderBottom: "2px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 8, height: 8, background: topic.color, flexShrink: 0 }} />
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", letterSpacing: "0.08em", color: "var(--navy)" }}>{topic.phase.toUpperCase()}</span>
+                </div>
+                <div style={{ padding: "8px 0" }}>
+                  {topic.guides.map((guide, i) => (
+                    <Link key={guide} href="/guides"
+                      style={{ display: "block", padding: "9px 16px", fontFamily: "var(--font-heading)", fontSize: "0.78rem", fontWeight: 600, color: "var(--ink-mid)", textDecoration: "none", borderBottom: i < topic.guides.length - 1 ? "1px solid var(--border-light)" : "none", transition: "color 0.15s, background 0.15s" }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = `${topic.color}`; (e.currentTarget as HTMLElement).style.background = "var(--surface-warm)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "var(--ink-mid)"; (e.currentTarget as HTMLElement).style.background = "transparent"; }}>
+                      {guide}
+                    </Link>
+                  ))}
+                </div>
+                <div style={{ height: 3, background: `repeating-linear-gradient(-45deg, ${topic.color}, ${topic.color} 2px, transparent 2px, transparent 8px)` }} />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── Features ─────────────────────────────────────── */}
-      <section style={{ padding: "72px 0", background: "var(--navy-light)", borderTop: "2px solid var(--border)", borderBottom: "2px solid var(--border)" }}>
+      <section style={{ padding: "72px 0" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem,4vw,3.5rem)", color: "var(--navy)", letterSpacing: "0.02em" }}>
@@ -202,10 +276,10 @@ export default function LandingPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
             {[
-              { icon: Zap, title: "Step-by-step clarity", desc: "Each step tells you exactly what to do, why it matters, and what tool to use.", color: "var(--orange)" },
-              { icon: CheckCircle2, title: "Track your progress", desc: "Visual progress across all 6 phases. See exactly where you are and what's next.", color: "#8B5CF6" },
+              { icon: Zap, title: "Step-by-step clarity", desc: "Each step tells you exactly what to do, why it matters, and which tool to use.", color: "var(--orange)" },
+              { icon: CheckCircle2, title: "Track your progress", desc: "Visual progress across all 10 phases. See exactly where you are and what comes next.", color: "#8B5CF6" },
               { icon: Shield, title: "Vetted tools only", desc: "Every resource is hand-picked. No spam, no hidden upsells. Affiliate-disclosed.", color: "#16A34A" },
-              { icon: Users, title: "Multiple businesses", desc: "Managing more than one venture? Track each separately in one dashboard.", color: "#0EA5E9" },
+              { icon: BookOpen, title: "200+ launch guides", desc: "Deep-dive articles for every phase, every question, every edge case you'll face.", color: "#0EA5E9" },
             ].map((f) => (
               <div key={f.title} className="stat-card" style={{ transition: "box-shadow 0.2s" }}
                 onMouseEnter={e => (e.currentTarget.style.boxShadow = "4px 4px 0 var(--border)")}
@@ -221,8 +295,74 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Product Ladder ────────────────────────────────── */}
+      <section style={{ padding: "72px 0", background: "var(--navy)", borderTop: "2px solid var(--border)", borderBottom: "2px solid var(--border)" }}>
+        <div className="stripe-accent" style={{ opacity: 0.4 }} />
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 12 }}>
+            <div style={{ height: 1, width: 40, background: "var(--orange)" }} />
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "0.68rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>Where this takes you</span>
+          </div>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem,4vw,3.5rem)", color: "white", letterSpacing: "0.02em", lineHeight: 1, marginBottom: 40 }}>
+            LAUNCH IS JUST<br /><span style={{ color: "var(--orange)" }}>THE BEGINNING.</span>
+          </h2>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            {[
+              {
+                step: "01",
+                title: "LaunchAdvisor",
+                subtitle: "Zero → Launch",
+                desc: "Start here. Get your business from idea to open for business with the 55-step checklist.",
+                cta: "You are here",
+                ctaHref: "/checklist",
+                color: "var(--orange)",
+                active: true,
+              },
+              {
+                step: "02",
+                title: "Build to Disappear",
+                subtitle: "$0 → $10M",
+                desc: "Once you launch, scale with systems. Build a business that runs without you — free playbook for post-launch founders.",
+                cta: "Coming soon",
+                ctaHref: "#",
+                color: "#8B5CF6",
+                active: false,
+              },
+              {
+                step: "03",
+                title: "MeetMyCXO",
+                subtitle: "AI Executive Suite",
+                desc: "CMO, CFO, CRO, COO, CTO — AI advisors trained on your business, available on demand.",
+                cta: "Join waitlist →",
+                ctaHref: "https://meetmycxo.com",
+                color: "#16A34A",
+                active: false,
+              },
+            ].map((item) => (
+              <div key={item.step} style={{ border: `2px solid ${item.active ? item.color : "rgba(255,255,255,0.12)"}`, background: item.active ? "rgba(249,115,22,0.08)" : "rgba(255,255,255,0.04)", padding: "28px 24px", position: "relative" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "3rem", color: item.color, lineHeight: 1, opacity: 0.25 }}>{item.step}</span>
+                  {item.active && (
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: "0.6rem", letterSpacing: "0.2em", background: "var(--orange)", color: "white", padding: "3px 10px" }}>CURRENT</span>
+                  )}
+                </div>
+                <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", letterSpacing: "0.03em", color: "white", lineHeight: 1, marginBottom: 4 }}>{item.title.toUpperCase()}</h3>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "0.75rem", letterSpacing: "0.15em", color: item.color, marginBottom: 14 }}>{item.subtitle}</p>
+                <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: 20 }}>{item.desc}</p>
+                <a href={item.ctaHref} style={{ fontFamily: "var(--font-heading)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: item.active ? "var(--orange)" : "rgba(255,255,255,0.35)", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
+                  {item.cta} {item.active && <ArrowRight style={{ width: 14, height: 14 }} />}
+                </a>
+                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: `repeating-linear-gradient(-45deg, ${item.color}, ${item.color} 2px, transparent 2px, transparent 8px)`, opacity: item.active ? 1 : 0.3 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="stripe-accent" style={{ marginTop: 40, opacity: 0.4 }} />
+      </section>
+
       {/* ── Testimonials ─────────────────────────────────── */}
-      <section style={{ padding: "72px 0", maxWidth: 1200, margin: "0 auto", paddingLeft: 24, paddingRight: 24 }}>
+      <section style={{ padding: "72px 24px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 12 }}>
           <div style={{ height: 1, width: 40, background: "var(--orange)" }} />
           <span style={{ fontFamily: "var(--font-display)", fontSize: "0.68rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Real founders</span>
@@ -251,9 +391,12 @@ export default function LandingPage() {
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.5rem,6vw,5rem)", color: "white", letterSpacing: "0.02em", lineHeight: 1, marginBottom: 16 }}>
             YOUR BUSINESS<br /><span style={{ color: "var(--orange)" }}>WON&apos;T LAUNCH ITSELF.</span>
           </h2>
-          <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.55)", fontSize: "1.1rem", marginBottom: 32 }}>Free to start. No credit card required.</p>
-          <Link href="/login" className="btn btn-primary" style={{ fontSize: "0.85rem", padding: "14px 36px" }}>
-            Start my launch plan <ArrowRight style={{ width: 18, height: 18 }} />
+          <p style={{ fontFamily: "var(--font-body)", color: "rgba(255,255,255,0.55)", fontSize: "1.1rem", marginBottom: 32 }}>
+            Free to start. No credit card. No fluff.<br />
+            <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.35)" }}>55 steps. 10 phases. Every tool vetted.</span>
+          </p>
+          <Link href="/checklist" className="btn btn-primary" style={{ fontSize: "0.85rem", padding: "14px 36px" }}>
+            Open the free checklist <ArrowRight style={{ width: 18, height: 18 }} />
           </Link>
         </div>
         <div className="stripe-accent" />
@@ -266,11 +409,14 @@ export default function LandingPage() {
             LAUNCH<span style={{ color: "var(--orange)" }}>ADVISOR</span>
           </span>
           <div style={{ display: "flex", gap: 24 }}>
-            {["Privacy", "Terms", "Contact"].map(l => (
-              <a key={l} href="#" style={{ fontFamily: "var(--font-heading)", fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-muted)" }}>{l}</a>
+            {[["Checklist", "/checklist"], ["Guides", "/guides"], ["Resources", "/resources"], ["Privacy", "#"], ["Terms", "#"]].map(([label, href]) => (
+              <Link key={label} href={href} style={{ fontFamily: "var(--font-heading)", fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-muted)", textDecoration: "none" }}>{label}</Link>
             ))}
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "var(--ink-muted)" }}>© 2026 LaunchAdvisor</p>
+          <div style={{ textAlign: "right" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "var(--ink-muted)" }}>© 2026 LaunchAdvisor</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", color: "var(--border-light)", marginTop: 2 }}>Some links are affiliate links. See our <a href="#" style={{ color: "var(--ink-muted)" }}>disclosure</a>.</p>
+          </div>
         </div>
       </footer>
     </div>
