@@ -1,5 +1,8 @@
 import type { Guide } from "./types";
 
+// Phase 10 — Operate: 20 SEO-optimized guides covering SOPs, hiring, delegation,
+// remote teams, automation, metrics, customer success, and scaling.
+
 export const guides: Guide[] = [
   // ── 1. Notion vs Asana vs ClickUp vs Monday ──────────────────────────────
   {
