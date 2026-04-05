@@ -1,24 +1,31 @@
-import fs from 'fs';
-import path from 'path';
 import type { Guide } from '../types';
 
 export const getTailoredGuides = (): Guide[] => {
   const allGuides: Guide[] = [];
-  try {
-    const dir = path.join(process.cwd(), 'lib/data/guides/tailored');
-    const files = fs.readdirSync(dir);
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        try {
-          const content = fs.readFileSync(path.join(dir, file), 'utf8');
-          allGuides.push(...JSON.parse(content));
-        } catch (err) {
-          console.warn(`Failed to parse ${file}`);
-        }
-      }
-    }
-  } catch (err) {
-    console.warn("Could not load tailored guides directory.", err);
-  }
+  allGuides.push(...(require('./airbnb-short-term-rental-first-property.json')));
+  allGuides.push(...(require('./childcare-babysitting-nanny-business.json')));
+  allGuides.push(...(require('./cleaning-business.json')));
+  allGuides.push(...(require('./coaching-online-education.json')));
+  allGuides.push(...(require('./consulting-any-type.json')));
+  allGuides.push(...(require('./e-commerce-online-selling.json')));
+  allGuides.push(...(require('./fitness-personal-training.json')));
+  allGuides.push(...(require('./food-truck-pop-up-food-business.json')));
+  allGuides.push(...(require('./freelance-tech-it-services.json')));
+  allGuides.push(...(require('./freelancer-independent-creator.json')));
+  allGuides.push(...(require('./hair-nail-beauty-solo.json')));
+  allGuides.push(...(require('./home-services-handyman.json')));
+  allGuides.push(...(require('./lawn-care-landscaping.json')));
+  allGuides.push(...(require('./logistics-freight-independent-trucking.json')));
+  allGuides.push(...(require('./marketing-freelancer-micro-agency.json')));
+  allGuides.push(...(require('./other-home-property-services.json')));
+  allGuides.push(...(require('./personal-errands-concierge-services.json')));
+  allGuides.push(...(require('./pet-services-solo.json')));
+  allGuides.push(...(require('./photography-videography.json')));
+  allGuides.push(...(require('./private-healthcare-medspa-practices.json')));
+  allGuides.push(...(require('./real-estate-agencies-brokerages.json')));
+  allGuides.push(...(require('./snack-bar-concession-catering-solo.json')));
+  allGuides.push(...(require('./software-publishers-saas.json')));
+  allGuides.push(...(require('./specialty-retail-pop-up-shop.json')));
+  allGuides.push(...(require('./specialty-trade-solo.json')));
   return allGuides;
 };
