@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getGuideBySlug, getAllGuides } from "@/lib/data/guides/index";
 import { getStepById } from "@/lib/data/checklist";
 import type { Guide } from "@/lib/data/guides/types";
+import { getAffiliateUrl } from "@/lib/config/affiliates";
 
 const PHASE_COLORS: Record<number, string> = {
   1: "#F97316", 2: "#8B5CF6", 3: "#16A34A", 4: "#0EA5E9",
@@ -192,7 +193,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           </h2>
           <div style={{ display: "grid", gap: 12 }}>
             {guide.affiliates.map((aff, i) => (
-              <a key={i} href={aff.url} target="_blank" rel="noopener noreferrer sponsored"
+              <a key={i} href={getAffiliateUrl(aff.name, aff.url)} target="_blank" rel="noopener noreferrer sponsored"
                 style={{
                   display: "flex", alignItems: "center", gap: 16, padding: "16px 20px",
                   border: "2px solid var(--border)", background: "var(--surface)",

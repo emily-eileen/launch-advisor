@@ -15,6 +15,7 @@ import { getStepById, getAdjacentSteps, getPhaseColor, phases } from "@/lib/data
 import { getGuidesForStep } from "@/lib/data/guides/index";
 import type { Guide } from "@/lib/data/guides/types";
 import { BUSINESS_CATEGORIES } from "@/app/quiz/page";
+import { getAffiliateUrl } from "@/lib/config/affiliates";
 
 // ── Premium features catalog ──────────────────────────────
 const ALL_PREMIUM_FEATURES: {
@@ -498,7 +499,7 @@ export default function StepDetailPage() {
                   </p>
                 )}
                 <a
-                  href={resource.url}
+                  href={getAffiliateUrl(resource.name, resource.url)}
                   target="_blank"
                   rel={resource.affiliate ? "noopener noreferrer sponsored" : "noopener noreferrer"}
                   style={{
