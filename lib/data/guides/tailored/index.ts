@@ -1,31 +1,49 @@
+import fs from 'fs';
+import path from 'path';
 import type { Guide } from '../types';
+
+const TAILORED_FILES = [
+  'airbnb-short-term-rental-first-property',
+  'childcare-babysitting-nanny-business',
+  'cleaning-business',
+  'coaching-online-education',
+  'consulting-any-type',
+  'e-commerce-online-selling',
+  'fitness-personal-training',
+  'food-truck-pop-up-food-business',
+  'freelance-tech-it-services',
+  'freelancer-independent-creator',
+  'hair-nail-beauty-solo',
+  'home-services-handyman',
+  'lawn-care-landscaping',
+  'logistics-freight-independent-trucking',
+  'marketing-freelancer-micro-agency',
+  'other-home-property-services',
+  'personal-errands-concierge-services',
+  'pet-services-solo',
+  'photography-videography',
+  'private-healthcare-medspa-practices',
+  'real-estate-agencies-brokerages',
+  'snack-bar-concession-catering-solo',
+  'software-publishers-saas',
+  'specialty-retail-pop-up-shop',
+  'specialty-trade-solo',
+];
+
+const TAILORED_DIR = path.join(process.cwd(), 'lib/data/guides/tailored');
 
 export const getTailoredGuides = (): Guide[] => {
   const allGuides: Guide[] = [];
-  allGuides.push(...(require('./airbnb-short-term-rental-first-property.json')));
-  allGuides.push(...(require('./childcare-babysitting-nanny-business.json')));
-  allGuides.push(...(require('./cleaning-business.json')));
-  allGuides.push(...(require('./coaching-online-education.json')));
-  allGuides.push(...(require('./consulting-any-type.json')));
-  allGuides.push(...(require('./e-commerce-online-selling.json')));
-  allGuides.push(...(require('./fitness-personal-training.json')));
-  allGuides.push(...(require('./food-truck-pop-up-food-business.json')));
-  allGuides.push(...(require('./freelance-tech-it-services.json')));
-  allGuides.push(...(require('./freelancer-independent-creator.json')));
-  allGuides.push(...(require('./hair-nail-beauty-solo.json')));
-  allGuides.push(...(require('./home-services-handyman.json')));
-  allGuides.push(...(require('./lawn-care-landscaping.json')));
-  allGuides.push(...(require('./logistics-freight-independent-trucking.json')));
-  allGuides.push(...(require('./marketing-freelancer-micro-agency.json')));
-  allGuides.push(...(require('./other-home-property-services.json')));
-  allGuides.push(...(require('./personal-errands-concierge-services.json')));
-  allGuides.push(...(require('./pet-services-solo.json')));
-  allGuides.push(...(require('./photography-videography.json')));
-  allGuides.push(...(require('./private-healthcare-medspa-practices.json')));
-  allGuides.push(...(require('./real-estate-agencies-brokerages.json')));
-  allGuides.push(...(require('./snack-bar-concession-catering-solo.json')));
-  allGuides.push(...(require('./software-publishers-saas.json')));
-  allGuides.push(...(require('./specialty-retail-pop-up-shop.json')));
-  allGuides.push(...(require('./specialty-trade-solo.json')));
+  for (const file of TAILORED_FILES) {
+    const raw = fs.readFileSync(path.join(TAILORED_DIR, `${file}.json`), 'utf-8');
+    allGuides.push(...(JSON.parse(raw) as Guide[]));
+  }
   return allGuides;
+};
+
+export const getTailoredGuidesByCategory = (categorySlug: string): Guide[] => {
+  const filePath = path.join(TAILORED_DIR, `${categorySlug}.json`);
+  if (!fs.existsSync(filePath)) return [];
+  const raw = fs.readFileSync(filePath, 'utf-8');
+  return JSON.parse(raw) as Guide[];
 };

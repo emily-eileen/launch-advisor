@@ -30,10 +30,9 @@ export async function getTailoredCategoryGuides(businessType: string): Promise<G
   if (!businessType) return [];
   const categorySlug = businessType.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   try {
-    const tailoredGuides = await import(`./tailored/${categorySlug}.json`);
-    return tailoredGuides.default || tailoredGuides;
+    const mod = await import('./tailored/index');
+    return mod.getTailoredGuidesByCategory(categorySlug);
   } catch (err) {
-    // Fall back to original generic guides
     return [];
   }
 }
